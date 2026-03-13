@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid with p5.js</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script> 
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 25px;
+            width: 800px;
+            height: 800px;
+        }
+
+        .grid-item {
+            background-color: #3498db;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            border-radius: 10px;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            z-index: 10;
+        }
+
+        .grid-item:hover {
+            transform: scale(1.05);
+            background-color: #2980b9;
+        }
+
+        /* The div where p5.js will draw */
+        #p5-container {
+            background-color: rgb(0, 0, 0);
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+
+    <div class="grid-container">
+        <a href="/part2.html" class="grid-item">Part 1</a>
+        <a href="/Meca/Meca.html" id="p5-container-pendulum" class="grid-item"></a>
+        <a href="/Hydrogen/Hydrogen.html" id="p5-container-dipole" class="grid-item"></a>
+        <a href="/Coupled/Coupled.html" class="grid-item">Part 4</a>
+    </div>
+
+    <script src="pendulum.js"></script>
+    <script src="dipole.js"></script>
+    <!-- <script src="test.js"></script> -->
+
+</body>
+</html>

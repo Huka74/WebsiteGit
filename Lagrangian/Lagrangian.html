@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 1</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.9.0/lib/browser/math.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.css">
+    <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js">
+    </script>
+
+    <link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+
+\(\definecolor{green}{RGB}{105,156,82}\)
+\(\definecolor{blue}{RGB}{35,107,142}\)
+\(\definecolor{red}{RGB}{207,80,68}\)
+\(\definecolor{yellow}{RGB}{232,193,28}\)
+\(\definecolor{orange}{RGB}{199,141,70}\)
+
+
+<div class="main-content">
+
+    
+
+    <h1>Lagrangian mechanics</h1>
+    <p>This is the content for Part 1.</p>
+    <a href="/Home/index.html">Back to Home</a>
+
+
+    Classical mechanics is often treated using the laws of motion formulated
+    by Newton, where the dynamics of a system are determined by the forces acting on it via 
+    \(\mathbf{F}=m\mathbf{a}\). ALthough this approach is direct and physically intuitive,
+    as systems become more complex, featuring constraints, multiple interacting bodies, 
+    or motion in curvilinear coordinates, the explicit analysis of forces can become cumbersome. <br> 
+    A powerful alternative formulation, developed in the eighteenth century by Lagrange, 
+    shifts the focus from forces to energies and from vector equations to scalar quantities. 
+    In Lagrangian mechanics, the motion of a system is derived from a single scalar function, the Lagrangian 
+    \(\mathcal{L}=T-V\), defined as the difference between kinetic and potential energy. 
+    Rather than using the forces to computing the future positions and velocities of the particle, 
+    the whole trajectory of the system is determined between two points for a given time.
+    This trajectory correspond to a stationary point of the action \(S\), the time integral of the Lagrangian.
+    This is the principle of least action, sometimes more accuraltly called principle
+    of stationary action. 
+    This reformulation not only reproduces Newton's laws but also provides a more 
+    systematic and flexible framework, particularly well suited to constrained systems, 
+    generalized coordinates, and later developments in modern physics.
+    <br><br><br>
+    Here, two systems will be considered to illustrate the principle of stationary action:
+    a particle in simple one dimensionnal motion under constant acceleration,
+    and a particle in a gravity potential \(V(r)=-\frac{k}{r}\)
+    
+
+    <h3>Euler-Lagrange equation</h3>
+
+    First, let's find the equation giving the trajectory that extremize the action.
+    As stated before, the action is the time integral of the Lagrangian.
+    It has dimension \([J]\cdot [s]\), and depends on the trajectory taken by the particle.
+    It is then a functionnal, that takes a path \(\mathbf{x}\), and return a value.
+    \begin{equation}
+    S[\mathbf{x}] = \int_0^{T} \mathcal{L}(\mathbf{x},\dot{\mathbf{x}},t)\mathrm{d}t
+    \end{equation}
+    Similarly to function extremization, to find the stationary point of a functionnal,
+    one consider a small displacement on the trajectory
+    \(\mathbf{x}(t)=\mathbf{x}_0(t)+\delta\mathbf{x}(t)\) <br>
+    The displacement \(\delta\mathbf{x}(t)\) is arbitrary, appart from the boundary conditions:
+    The starting and end points of the trajectory are fixed, imposing
+    \(\delta\mathbf{x}(0)=0, \delta\mathbf{x}(T)=0\).
+    \begin{equation}
+    \begin{split}
+    S[\mathbf{x}_0+\delta\mathbf{x}]-S[\mathbf{x}_0] & = 
+    \int_0^{T} \mathcal{L}(\mathbf{x}_0+\delta\mathbf{x},\dot{\mathbf{x}}_0+\dot{\delta\mathbf{x}},t)
+    - \mathcal{L}(\mathbf{x}_0,\dot{\mathbf{x}}_0,t)\mathrm{d}t \\
+    & = \int_0^{T} \frac{\partial \mathcal{L}}{\partial x}\delta\mathbf{x} + \frac{\partial \mathcal{L}}{\partial \dot{x}}\dot{\delta\mathbf{x}} \mathrm{d}t \\
+    \end{split}
+    \end{equation}
+    By integration by part, and using the boundary conditions \(\delta\mathbf{x}(0)=0, \delta\mathbf{x}(T)=0\).
+    \begin{equation}
+    \begin{split} 
+    \int_0^{T} \frac{\partial \mathcal{L}}{\partial \dot{x}}\dot{\delta\mathbf{x}} \mathrm{d}t & =
+    \underbrace{\left.\frac{\partial \mathcal{L}}{\partial \dot{x}} \delta\mathbf{x}\right|_0^{T}}_{0} - \int_0^{T} \frac{\mathrm{d}}{\mathrm{d}t}\frac{\partial \mathcal{L}}{\partial \dot{x}}\delta\mathbf{x} \mathrm{d}t
+    \end{split}
+    \end{equation}
+
+    \begin{equation}
+    \begin{split}
+    S[\mathbf{x}_0+\delta\mathbf{x}]-S[\mathbf{x}_0] & = 
+    \int_0^{T} \frac{\partial \mathcal{L}}{\partial x}\delta\mathbf{x} - \frac{\mathrm{d}}{\mathrm{d}t}\frac{\partial \mathcal{L}}{\partial \dot{x}}\delta\mathbf{x} \mathrm{d}t \\
+    & = \int_0^{T} \left(\frac{\partial \mathcal{L}}{\partial x} - \frac{\mathrm{d}}{\mathrm{d}t}\frac{\partial \mathcal{L}}{\partial \dot{x}}\right) \delta\mathbf{x} \mathrm{d}t = 0 \\
+    \end{split}
+    \end{equation}
+    Imposing \(S[\mathbf{x}_0+\delta\mathbf{x}]-S[\mathbf{x}_0] = 0\) gives the condition for stationnary point.<br> 
+    Since the displacement is arbitrary, the only way to make the equation hold is to set 
+    \begin{equation} 
+    \frac{\mathrm{d}}{\mathrm{d}t}\frac{\partial \mathcal{L}}{\partial \dot{x}} - \frac{\partial \mathcal{L}}{\partial x} = 0
+    \end{equation}
+    This is the Euler-Lagrange equation. Solving it gives the physical trajectory of the system.<br> 
+    In the simple case of cartesian coordinates and time independent potential,
+    the Lagrangian is \(\mathcal{L} = \frac{1}{2}m\dot{\mathbf{x}}^2 - V(\mathbf{x})\). <br> 
+    The Euler-Lagrange equation gives \(m\ddot{\mathbf{x}} = -\mathbf{\nabla} V(\mathbf{x})\), which is exactly Newton's equation
+    
+    <h3>Euler-Lagrange equation</h3>
+
+    Let's apply the principle of least action to a particle subject to contsnat gravitationnal field.<br>
+    Let's consider a particle of mass \(m\) under constant downward acceleration \(mg\),
+    and find its trajectory from \(z_1\) to \(z_2\) for a time \(T\).<br>
+    The Euler-Lagrange equation gives naturally \(\ddot{z} = -g\)<br>
+    Integrating two times gives \(z(t) = -\frac{1}{2}gt^2+v_0t+z_0\)<br>
+    and imposing \(z(0)=z_1, z(T)=z_2\) gives the full trajectory \(z(t)=-\frac{1}{2}gt(t-T)+\frac{t}{T}(z_2-z_1)+z_1\)<br>
+    But for the sake of illustration of the least action principle, let's compute the action
+    of different trajectories. In particular, let's consider all possible parabola connecting
+    the starting and end points in a time \(T\).
+    Those trajectories have equation \(z_a(t) = \frac{1}{2}at(t-T)+\frac{t}{T}(z_2-z_1)+z_1\), 
+    with \(a\) a parameter.<br>
+    \(\mathcal{L}=\frac{1}{2}m\dot{z_a}^2-mgz_a\)
+    The action is \(S = \frac{mT^3}{24}a(a+2g) + \frac{m}{2}\frac{(z_2-z_1)^2}{T} - \frac{gmT}{2}(z_1+z_2)\)<br>
+    Treating the action as a function of \(a\), we can simply find the extremum:<br>
+    \begin{equation} 
+    \frac{\mathrm{d}S}{\mathrm{d}a} = \frac{1}{24}T^3\left(2a+2g\right) = 0 \quad \Longrightarrow \quad a=-g
+    \end{equation}
+    As expected, the stationnary point of the action is such that \(a=-g\), retrieving the previous result
+    for the trajectory \(z(t)\).
+    This means that the physical trajectory is the one where the second derivative of position, or the acceleration, 
+    correspond to \(-g\), as stated by the Euler-Lagrange and Newton equation \(\ddot{z} = -g\).
+    <br><br><br>
+    The following sketch shows those parabolic trajectories, between two (draggable) points,
+    for a (adjustable) time \(T\). The trajectory can be modified, changing the action on the left.
+    The physical trajectory is also shown. 
+    Clicking on the play button animate the particle, showing what the physical system behaves.
+
+    <div id="p5-container-parabole-lagrangian"
+    style="position: relative; height:300px; width:600px; left:25%; top:0px;">
+    </div>
+
+    <div id="p5-container-lagrangian"
+    style="position: relative; height:600px; width:600px; left:25%; top:0px;">
+    </div>
+
+    <div id="p5-container-catenary"
+    style="position: relative; height:600px; width:600px; left:25%; top:0px;">
+    </div>
+
+    
+    
+
+    
+
+</div>
+
+
+
+<script>
+    function toggleDetails(trigger) {
+        const arrow = trigger.querySelector('.arrow');
+        const detailsBox = trigger.nextElementSibling;
+        const textSpan = trigger.querySelector('span:last-child');
+        
+        arrow.classList.toggle('expanded');
+        detailsBox.classList.toggle('expanded');
+        
+        if (detailsBox.classList.contains('expanded')) {
+            textSpan.textContent = 'Hide detailed steps';
+        } else {
+            textSpan.textContent = 'Show detailed steps';
+        }
+    }
+</script>
+
+
+
+</div>
+</body>
+
+<script src="Catenary.js"></script>
+<script src="Lagrangian.js"></script>
+<script src="ParaboleAction.js"></script>
+<script src="/utils.js"></script>
+<script src="/UIObjects.js"></script>
+
+</html>

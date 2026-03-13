@@ -1,0 +1,85 @@
+html, body {
+  margin: 0px;
+  padding: 0;
+  --text-color: #000000;
+  --bg-color: #ffffff;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  /* transition: background-color 0.3s, color 0.3s; */
+  font-family: 'CMU Serif', serif;
+}
+
+/* * {
+  outline: 1px solid red;
+} */
+
+body.dark-theme {
+  --text-color: #f0f0f0;
+  --bg-color: #303030;
+}
+
+.main-content {
+  margin-left: 200px;
+  margin-right: 200px;
+  background-color: inherit;
+  color: inherit;
+}
+
+
+.collapsible-trigger {
+    display: inline-flex;
+    align-items: center;
+    color: #2196F3;
+    cursor: pointer;
+    user-select: none;
+    margin: 10px 0;
+    font-weight: 500;
+}
+
+.collapsible-trigger:hover {
+    color: #0b7dda;
+}
+
+.arrow {
+    display: inline-block;
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+    font-size: 14px;
+}
+
+.arrow.expanded {
+    transform: rotate(90deg);
+}
+
+.details-box {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.4s ease, margin 0.4s ease;
+    /* background: white; */
+    border-left: 4px solid #0b7dda;
+    padding: 0 15px;
+    margin: 0;
+    border-radius: 2px;
+}
+
+.details-box.expanded {
+  max-height: 1000px;
+  padding: 15px;
+  margin: 10px 0;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+canvas {
+  display: block;
+}
+
+
+a.custom-link {
+  text-decoration: none;   /* remove underline */
+  color: #29baa7;          /* use surrounding text color */
+}
+
+a.custom-link:visited {
+  color: #29baa7;          /* remove purple on visited */
+}
+

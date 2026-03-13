@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 1</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.9.0/lib/browser/math.js"></script>
+
+    <script>
+        window.MathJax = {tex: {tags: 'ams'   // 'ams' | 'all' | 'none'
+        }};
+   </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.css">
+    <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js">
+    </script>  
+
+
+    <link rel="stylesheet" href="/style.css">
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.138.0/build/three.module.js",
+                "OrbitControls": "https://unpkg.com/three@0.138.0/examples/jsm/controls/OrbitControls.js",
+                "MarchingCubes": "https://unpkg.com/three@0.138.0/examples/jsm/objects/MarchingCubes.js"
+            }
+        }
+    </script>
+
+</head>
+
+<body>
+
+
+<!-- \(\definecolor{green}{RGB}{105,156,82}\)
+\(\definecolor{blue}{RGB}{35,107,142}\)
+\(\definecolor{red}{RGB}{207,80,68}\)
+\(\definecolor{yellow}{RGB}{232,193,28}\)
+\(\definecolor{orange}{RGB}{199,141,70}\) -->
+<script src="/navbar.js"></script>
+
+
+<div class="main-content">
+
+    <h1>Atom</h1>
+    <p>This is the content for Part 3.</p>
+    <a href="/Home/index.html">Back to Home</a>
+    
+
+    We will solve for the electronic orbitals of the Hydrogen atom with no quatum mechanic consideration 
+    except the Schrödinger equation. All quantization of the quantum numbers will naturally come 
+    out of the normalization condition.<br>
+
+    <h1>The Schrödinger equation</h1>
+    The system consists of an electron and a proton interacting with the Coulomb force.<br>
+    We denote the position, momentum and the mass of the electron \(\mathbf{r}_e,\mathbf{p}_e,m_e\)
+    and of the proton \(\mathbf{r}_p,\mathbf{p}_p,m_p\).<br>
+    The Hamiltonian is 
+    \[H(\mathbf{r}_e,\mathbf{r}_p,\mathbf{p}_e,\mathbf{p}_p) = \frac{\mathbf{p}_p^2}{2m_p}+\frac{\mathbf{p}_e^2}{2m_e}-\frac{e^2}{4\pi\epsilon_0}\frac{1}{|\mathbf{r}_p-\mathbf{r}_p|}\]
+
+    <br>Considering the form of the potential in \(f(|\mathbf{r}_p-\mathbf{r}_p|)\), it would be advantageous to consider
+    the new variable \(\mathbf{r}=\mathbf{r}_p-\mathbf{r}_e\), as well as \(\mathbf{R}=\frac{m_e\mathbf{r}_e+m_p\mathbf{r}_p}{m_e+m_p}\)
+    and \(\mathbf{P}=M\dot{\mathbf{R}}=\mathbf{p}_p+\mathbf{p}_e\) the position and the momentum of the center of mass, with \(M=m_e+m_p\).
+    \begin{split}
+    \frac{\mathbf{P}^2}{2M} & = \frac{\mathbf{p}_p^2+\mathbf{p}_e^2+2\mathbf{p}_p\mathbf{p}_e}{2M} = \frac{\mathbf{p}_p^2}{2m_p}+\frac{\mathbf{p}_e^2}{2m_e}-\left(\frac{\mathbf{p}_p^2}{2m_p}-\frac{\mathbf{p}_p^2}{2M}+\frac{\mathbf{p}_e^2}{2m_e}-\frac{\mathbf{p}_e^2}{2M}-\frac{2\mathbf{p}_e\mathbf{p}_p}{2M}\right)\\
+    & = \frac{\mathbf{p}_p^2}{2m_p}+\frac{\mathbf{p}_e^2}{2m_e}-\left(\frac{m_p^2\dot{\mathbf{r}}_p^2}{2}\left(\frac{M-m_p}{m_pM}\right)+\frac{m_e^2\mathbf{r}_e^2}{2}\left(\frac{M-m_e}{m_pM}\right)-\frac{2m_pm_e\mathbf{r}_e\mathbf{r}_p}{2M}\right)\\
+    & = \frac{\mathbf{p}_p^2}{2m_p}+\frac{\mathbf{p}_e^2}{2m_e} - \frac{m_em_p}{m_p+m_e}\frac{(\dot{\mathbf{r}}_p-\dot{\mathbf{r}}_e)^2}{2}\\
+\end{split}
+This form lead us to define \(\mathbf{p}=\mu(\dot{\mathbf{r}}_p-\dot{\mathbf{r}}_e)\) with \(\mu=\frac{m_pm_e}{m_p+m_e}\)
+and have \(\frac{\mathbf{p}_p^2}{2m_p}+\frac{\mathbf{p}_e^2}{2m_e} = \frac{\mathbf{P}^2}{2M} +\frac{\mathbf{p}^2}{2\mu}\).
+<br><br>With the new variables, the Hamiltonian becomes 
+\begin{equation}
+    H(\mathbf{r}_e,\mathbf{r}_p,\mathbf{p}_e,\mathbf{p}_p) = \frac{\mathbf{p}_p^2}{2m_p}+\frac{\mathbf{p}_e^2}{2m_e}-\frac{k}{|\mathbf{r}_p-\mathbf{r}_p|} \qquad 
+    H(\mathbf{r},\mathbf{R},\mathbf{p},\mathbf{P}) = \frac{\mathbf{P}^2}{2M} +\frac{\mathbf{p}^2}{2\mu} - \frac{k}{|\mathbf{r}|}
+\end{equation}
+
+<br> We can, without loss of generality, put ourself in the referential of the center of mass,
+cancelling the global translation of the system (\(\mathbf{P}=0\)).
+Finally, the Hamiltonian to consider is
+\begin{equation}
+    H(\mathbf{r},\mathbf{R},\mathbf{p},\mathbf{P}) = \frac{\mathbf{p}^2}{2\mu} - \frac{k}{|\mathbf{r}|}
+\end{equation}
+
+<br><br> The change of variable for a 2 body-problem is illustrated in the animation below.
+The button can be used to switch from the original and center of mass coordinate. The slider can be used
+to vary the ratio of mass of the two particles. Notice in the limit of large mass ratio, \(r_p\rightarrow R, \mu\rightarrow m_e\), (in our case, \(m_p/m_e\sim1000\)) <br>
+
+<input id="mass-slider" type="range" min="0" max="1" step="0.05" value="0" style="position:relative; left: 50%; transform: translate(-50%, 0%); width:200px;">
+<div id="p5-container-coord" style="position: relative; height:350px; width:500px; left: 50%; transform: translate(-50%, 0%);"></div>
+
+Going to the quantum case, the Schrödinger equation associated to this Hamiltonian is
+\begin{equation}
+    \left(-\frac{\hbar^2}{2\mu}\nabla^2-\frac{k}{r}\right)\psi=E\psi
+\end{equation}
+
+<h1>Solving the equation</h1>
+The potential only depends in \(|\mathbf{r}|\), it is therefore natural to use spherical coordinates.
+Writing the laplacian (\(\nabla^2\)) in spherical coordinate, we get:
+\begin{equation}
+    \left(-\frac{\hbar^2}{2\mu}\left(\frac{1}{r^2}\frac{\partial}{\partial r}\left(r^2\frac{\partial}{\partial r}\right)+\frac{1}{r^2\sin\theta}\frac{\partial}{\partial\theta}\left(\sin\theta\frac{\partial}{\partial\theta}\right)+\frac{1}{r^2\sin^2\theta}\frac{\partial^2}{\partial\phi^2}\right)-\frac{k}{r}-E\right)\psi(r,\theta,\phi)=0
+\end{equation}
+
+<h2>Separation of variables</h2>
+Using the separation of variables, we set the wavefunction to be equal to the product of three
+functions, each depending on only one coordinate: \(\psi(r,\theta,\phi)=R(r)\Theta(\theta)\Phi(\phi)\)
+\[\frac{1}{r^2}\frac{\partial}{\partial r}\left(r^2\frac{\partial R}{\partial r}\right)\frac{1}{R}+\frac{1}{r^2\sin\theta}\frac{\partial}{\partial\theta}\left(\sin\theta\frac{\partial \Theta}{\partial\theta}\right)\frac{1}{\Theta}+\frac{1}{r^2\sin^2\theta}\frac{\partial^2\Phi}{\partial\phi^2}\frac{1}{\Phi}+\frac{2\mu}{\hbar^2}\left(\frac{k}{r}+E\right) = 0\]
+Multiplying by \(r^2\), and putting all depedancies on \(r\) on one side, we get:
+\[\frac{\partial}{\partial r}\left(r^2\frac{\partial R}{\partial r}\right)\frac{1}{R}+\frac{2\mu r^2}{\hbar^2}\left(\frac{k}{r}+E\right) = -\frac{1}{\sin\theta}\frac{\partial}{\partial\theta}\left(\sin\theta\frac{\partial \Theta}{\partial\theta}\right)\frac{1}{\Theta}-\frac{1}{\sin^2\theta}\frac{\partial^2\Phi}{\partial\phi^2}\frac{1}{\Phi} = \alpha\]
+The left-hand side only depend on \(r\), while the right-hand side does not. This means that both sides of
+equation must be a constant, here denoted \(\alpha\). This gives the following two equations:
+\begin{equation}
+\left\{\begin{array}{l}
+         \frac{1}{R}\frac{\partial}{\partial r}\left(r^2\frac{\partial R}{\partial r}\right)+\frac{2\mu r^2}{\hbar^2}\left(\frac{k}{r}+E\right) = \alpha    \\
+         \frac{1}{\sin\theta}\frac{\partial}{\partial\theta}\left(\sin\theta\frac{\partial \Theta}{\partial\theta}\right)\frac{1}{\Theta}+\frac{1}{\sin^2\theta}\frac{\partial^2\Phi}{\partial\phi^2}\frac{1}{\Phi} = -\alpha
+    \end{array}\right.
+\end{equation}
+We can use the same method for the second equation: multiply by \(\sin^2\theta\) and seperate terms depeding on \(\theta\) and \(\phi\).
+By doing so, we again find the left-hand side depending only on one variable while the right-hand depending only on the other.
+Setting both equal to a constant, we get:
+\[\frac{1}{\Theta}\sin\theta\frac{\partial}{\partial\theta}\left(\sin\theta\frac{\partial \Theta}{\partial\theta}\right) + \alpha\sin^2\theta = -\frac{1}{\Phi}\frac{\partial^2\Phi}{\partial\phi^2} = \beta\]
+Finally, we have a system of three equations, for the radial \(R(r)\), polar \(\Theta(\theta)\) and azimuthal \(\Phi(\phi)\) part of the wavefunction.
+
+\begin{equation}\label{eq:syst}
+  \left\{\begin{array}{l}
+    \frac{1}{R}\frac{\partial}{\partial r}\left(r^2\frac{\partial R}{\partial r}\right)+\frac{2\mu r^2}{\hbar^2}\left(\frac{k}{r}+E\right) = \alpha    \\
+    \frac{1}{\Theta}\sin\theta\frac{\partial}{\partial\theta}\left(\sin\theta\frac{\partial \Theta}{\partial\theta}\right) + \alpha\sin^2\theta -\beta = 0  \\
+    \frac{1}{\Phi}\frac{\partial^2\Phi}{\partial\phi^2} + \beta = 0
+  \end{array}\right.\\
+\end{equation}
+
+<h2>Solving the azimuthal part</h2>
+Starting with the simplest equation, we solve for the azimuthal part:\ref{eq:syst}
+\[\frac{\partial^2\Phi}{\partial\phi^2} = -\beta\Phi\qquad \Longrightarrow \qquad \Phi = Ae^{i\sqrt{\beta}\phi}+Be^{-i\sqrt{\beta}\phi}\]
+Because \(\phi\) represent the angle around the polar axis, we have to impose periodic boundary condition:
+\[\Phi(\phi) = \Phi(\phi+2\pi) \qquad \Longrightarrow \qquad \beta=m^2,\:\: m\in\mathbb{Z}\]
+giving the first restriction on the constants, \(\beta=m^2\).
+
+<h2>Solving the polar part</h2>
+\[ \frac{1}{\Theta}\sin\theta\frac{\partial}{\partial\theta}\left(\sin\theta\frac{\partial \Theta}{\partial\theta}\right) + \alpha\sin^2\theta - m^2 = 0\]
+\[ \Theta''+\frac{\cos\theta}{\sin\theta} \: \Theta' + \left(\alpha - \frac{m^2}{\sin^2\theta}\right)\Theta = 0\]
+
+The equation is singular at \(\theta=0,\pi\). By expanding around \(\theta\sim0\) (the analysis is the same around \(\theta\sim\pi\))
+we get
+\[\Theta''+\frac{1}{\theta} \: \Theta' + \left(\alpha - \frac{m^2}{\theta^2}\right)\Theta = 0\]
+
+As we are looking for non divergent solution, we can write \(\Theta(\theta)\) as a power series.
+Let \(k\) be the power of the leading term of \(\Theta\), \(\Theta(\theta) = \theta^k+O(\theta^{k+1})\)
+(the leading term is the smallest power since we are looking around \(\theta\sim 0\))<br>
+Using this in the last equation, we get at first order \(k=\pm m\).<br>
+Once again, as we are looking for a wavefunction, we have to impose the solution to be 
+\(L_2\) i.e. square integrable. This mean we can discard diverging solutions, and keep \(k=|m|\).<br>
+Knowing this behavior around the singular points, we can use the following Ansätz:
+\[\Theta(\theta)=C(\theta)\sin^{|m|}(\theta)\]
+Using this in the polar equation gives:
+\[\sin^2\theta C''(\theta)+\cos\theta\sin\theta(2|m|+1)C'(\theta)+C(\theta)(\alpha\sin^2\theta-|m|-|m|^2)\]
+Changing the variable \(x=\cos\theta,\:\: \Theta(\theta)=y(\cos\theta),\:\: \frac{\partial}{\partial\theta}=-\sqrt{1-x^2}\frac{\partial}{\partial x}
+,\:\: \frac{\partial^2}{\partial\theta^2}=(1-x^2)\frac{\partial^2}{\partial x^2}-x\frac{\partial}{\partial x}\)<br>
+the equation becomes
+\[(1-x^2)y''-2xy'+(\alpha-|m|(|m|+1))y=0\]
+This is the associated Legendre equation. <br>
+Using the Frobenius method, we set \(y(x)=\sum_{n=0}^{\infty}a_ix^i\), and putting this in the equation
+gives the following reccurence for the coefficients: \(a_{n}=a_{n-2}\frac{(n-2)(n-1+2|m|)+|m|(|m|+1)-\alpha}{n(n-1)}\)
+
+Notice that \(\lim_{n\rightarrow\infty}\frac{a_{n+2}}{a_n}=1\), so for the series to converge and the solution to 
+not blow up at the poles \(x=\pm 1\), we impose that the series must terminate.
+This means that one of the term must vanish at some \(n\), and so \(n(n+1+2|m|)+|m|(|m|+1)-\alpha=0\).
+Rearanging the terms yields \(\alpha = (n+|m|)(n+|m|+1)\) for some \(n\in\mathbb{N}\).
+Therefore, for the solution to converge, we impose \(\alpha=l(l+1)\) with \(l\) an integer greater or equal to \(|m|\).
+
+The solution of the polar part is \(P_l^m(\cos\theta)\), the associated Legendre polynomials, with \(l\in\mathbb{N}, |m|\le l\) <br>
+
+Below, an iteractive way to see the termination condition of the series, and the convergence of the solution.
+The parameter \(\alpha\) can be changed, showing the effect on the coefficient of the series, and the solution of the equation.
+
+<div style="position:relative; left: 50%; transform: translate(-50%, 0%);  width:200px;">
+    <label id="slider-label" for="polar-slider" style="display: block; width:200px; text-align: center">
+        \(l = 0.0\)
+    </label>
+    <input id="polar-slider" type="range" min="0" max="10" step="0.2" value="0" style="width:200px;">
+</div>
+
+<div id="p5-container-polar" style="position: relative; height:400px; width:600px; left: 50%; transform: translate(-50%, 0%);"></div>
+
+<!-- <div style="position: relative; top: -200px; left: 435px;">
+    \(a_0 \hspace{1.3mm} a_1 \hspace{1.3mm} a_2 \hspace{1.3mm} a_3 \hspace{1.3mm} a_4 \hspace{1.3mm} a_5 \hspace{1.3mm} a_6 \hspace{1.3mm} a_7\)
+</div> -->
+
+<h2>Solving the radial part</h2>
+\[\frac{1}{R}\frac{\partial}{\partial r}\left(r^2\frac{\partial R}{\partial r}\right)+\frac{2\mu r^2}{\hbar^2}\left(\frac{k}{r}+E\right) = l(l+1)\]
+\[R''+\frac{2}{r}R'+\left(\frac{2\mu}{\hbar^2}\left(\frac{k}{r}+E\right) - \frac{l(l+1)}{r^2}\right)R = 0\]
+
+To solve this, we start by looking at asymptotic behaviors:<br>
+For \(r\longrightarrow 0\), keeping the dominant terms, the equation is<br>
+\[R''+\frac{2}{r}R' - \frac{l(l+1)}{r^2}R = 0\]
+Using the Ansätz \(R=r^\gamma\), we get \(\gamma(\gamma+1)=l(l+1) \Longrightarrow \gamma=l,-l-1\) <br>
+Keeping the non diverging solution, we have that \(R(r)\sim r^l\) for small \(r\). <br><br>
+
+For \(r\longrightarrow \infty\), keeping the dominant terms, the equation is<br>
+\[R''+\frac{2\mu E}{\hbar^2}R=0 \quad \Longrightarrow \quad R''=\kappa^2 R\]
+with \(\kappa^2=-\frac{2\mu E}{\hbar^2} > 0\) since we are looking for bound states, i.e. \(E < 0\).
+\[R=Ae^{\kappa r}+Be^{-\kappa r}\]
+Again, the solution needs to be normalizable, leading us to discard the exponential increasing solution.
+\(R\sim e^{\kappa r}\) for large \(r\).
+
+Those asymptotic behaviors can be included in the final Ansätz for \(R(r)\):
+\[R(r)=r^l e^{-\kappa r}y(r)\]
+Using this in the original equation gives
+\[y''(r)+2\left(\frac{l+1}{r}-\kappa\right)y'(r)+\left(\frac{2\mu k}{\hbar^2 r}-2\frac{\kappa(l+1)}{r}\right)y(r)=0\]
+Finally, by defining a rescaled variable \(\rho=2\kappa r\), the equation becomes
+\[ y''(\rho)\rho+(2(l+1)-\rho))y'(\rho)+\left(\frac{\mu k}{\hbar^2\kappa}-l-1\right)y(\rho)=0\]
+
+<div class="collapsible-trigger" onclick="toggleDetails(this)">
+    <span class="arrow">▶</span>
+    <span>Show detailed steps</span>
+</div>
+<div class="details-box">
+    Our Ansätz : \(R(r)=e^{-\kappa r}r^ly(r)\) <br>
+    First derivative : \(R'(r)=e^{-\kappa r}r^l\left(y'(r)+y(r)\left(\frac{l}{r}-\kappa\right)\right)\) <br>
+    Second derivative : \(R''(r)=e^{-\kappa r}r^l\left(y''(r)+2y'(r)\left(\frac{l}{r}-\kappa\right)+y(r)\left(\frac{l(l-1)}{r^2}-2\frac{\kappa l}{r}+\kappa^2\right)\right)\) <br><br>
+
+    \[R''+\frac{2}{r}R'+\left(\frac{2\mu}{\hbar^2}\left(\frac{k}{r}+E\right) - \frac{l(l+1)}{r^2}\right)R = 0\]
+    \[y''(r)+2\left(\frac{l+1}{r}-\kappa \right)y'(r)+\left(\frac{2\mu k}{\hbar^2 r}-2\frac{\kappa(l+1)}{r}\right)y(r)=0\]
+
+    With the change of variable \(\rho=2\kappa r,\:\: \partial_r=2\kappa\partial_\rho,\:\: \partial_r^2=4\kappa^2\partial_\rho^2\)
+    \[ y''(\rho)\rho+(2(l+1)-\rho))y'(\rho)+\left(\frac{\mu k}{\hbar^2\kappa}-l-1\right)y(\rho)=0\]
+</div>
+
+This last form is the generalized Laguerre equation
+\[xy''+(\alpha+1-x)y'-\lambda y=0\]
+with \(\alpha=2l+1\) and \(\lambda=\frac{\mu k}{\hbar^2\kappa}-l-1\) <br>
+Using the Frobenius method \(y(x)=\sum_{n=0}^{\infty} a_nx^n\), we get \(a_n=a_{n-1}\frac{n-1-\lambda}{n(n+\alpha)}\)
+Having the coefficients scaling like \(a_n\sim 1/n\), the series will grows exponentially in \(x\) if it does not terminate.
+So, as before, to ensure that the solution will be normalizable, we impose the series to termite, i.e.
+\(\lambda\) must be a positive integer.
+However, to be rigorous, one should compare the growth rate of the series to \(e^{-x/2}\), as it appears in the rest of the radial solution. <br>
+After some growth rate estimation, one can find that \(\sum_{n=0}^{\infty}a_nx^n \sim x^{-\lambda-\alpha-3/2}e^{x}\)
+which would still grows exponentially after adding the \(e^{-x/2}\) factor.
+<div class="collapsible-trigger" onclick="toggleDetails(this)">
+    <span class="arrow">▶</span>
+    <span>Show detailed steps</span>
+</div>
+<div class="details-box">
+    \[a_n=a_{n-1}\frac{n-1-\lambda}{n(n+\alpha)} = \frac{a_{0}}{n!}\frac{\Gamma(n-\lambda)}{\Gamma(-\lambda)}\frac{\Gamma(\alpha+1)}{\Gamma(n+\alpha+1)}\]
+    Using the Stirling approximation : \(\Gamma(x)\overset{x\rightarrow\infty}{\longrightarrow}\sqrt{\frac{2\pi}{x}}x^xe^{-x}\)
+    and recalling that \(\lim_{x\rightarrow\infty}\left(1+\frac{a}{x}\right)^x=e^a\)
+    \[ \frac{\Gamma(x+a)}{\Gamma(x+b)}\overset{x\rightarrow\infty}{\longrightarrow}\sqrt{\frac{x+b}{x+a}}\frac{(x+a)^{x+a}}{(x+b)^{x+b}}e^{b-a} = \sqrt{\frac{x+a}{x+b}}\left(\frac{1+\frac{a}{x}}{1+\frac{b}{x}}\right)^x\frac{(x+a)^{a}}{(x+b)^{b}}e^{b-a} \overset{x\rightarrow\infty}{\longrightarrow} x^{a-b}\]
+    With this approximation, we have that for large \(n\)
+    \[a_n=a_{0}\frac{\Gamma(\alpha+1)}{\Gamma(-\lambda)}\frac{1}{n!}\frac{\Gamma(n-\lambda)}{\Gamma(n+\alpha+1)}\sim \frac{n^{-\lambda-\alpha-1}}{n!}\]
+    Taking a lower bound on the series, and using again the Stirling approximation for the factorial, we get the following growth rate
+    \[\sum_{n=0}^\infty a_nx^n\ge a_kx^k\overset{k\sim [x]}{\sim} x^{-\lambda-\alpha-1}\frac{x^x}{x!}\sim x^{-\lambda-\alpha-3/2}e^{x}\]
+
+</div>
+
+This impose \(\lambda=\frac{\mu k}{\hbar^2\kappa}-l-1\) to be an integer in order to have a normalizable solution. <br>
+Setting \(\frac{\mu k}{\hbar^2\kappa}=n\in\mathbb{N}\), we have that \(n>l\) <br>
+Finally, we have our three quantum numbers with their condition:
+
+\begin{equation}
+\begin{array}{l}
+n,& 1\le n \\
+l,& 0\le l < n \\
+m,& -l\le m \le l\\
+\end{array}
+\end{equation}
+
+Replacing the expression for \(\kappa\), we can obtain the energy levels of the hydrogen: 
+\begin{equation}
+\frac{\mu k}{\hbar^2\kappa}=n \quad \Longrightarrow \quad E=-\frac{\mu e^4}{32\pi^2\epsilon_0^2\hbar^2}\frac{1}{n^2}=-\frac{R_y}{n^2}
+\end{equation}
+computing the value for \(R_y\) gives \(-13.59 \text{ eV}\) (\(-13.6 \text{ eV}\) if we use the mass of the electron istead of the reduced mass)
+
+<h2>Putting everything together</h2>
+In the end, the solution to the electronic orbitals of the Hydrogen atom is
+\begin{equation}
+\psi(r,\theta,\phi) = C \rho^l e^{-\rho/2} L^{2l+1}_{n-l-1}(\rho) P_l^m(\cos(\theta))e^{im\phi}
+\end{equation}
+with \(\rho=\frac{\mu e^2}{2\pi\epsilon_0\hbar^2 n}r=\frac{2}{a_0^* n}r\), \(\:a_0^*\) the reduced Bohr radius, \(\:\:L^{2l+1}_{n-l-1}\) being the generalized Laguerre polynomials,
+\(\:\:P_l^m\) the associated Legendre polynomials, and \(C\) the normalization constant.
+
+<script src="/Hydrogen/2bodies.js"></script>
+<script src="/Hydrogen/polarpart.js"></script>
+<script src="/utils.js"></script>
+<script src="/UIObjects.js"></script>
+
+<script>
+    function toggleDetails(trigger) {
+        const arrow = trigger.querySelector('.arrow');
+        const detailsBox = trigger.nextElementSibling;
+        const textSpan = trigger.querySelector('span:last-child');
+        
+        arrow.classList.toggle('expanded');
+        detailsBox.classList.toggle('expanded');
+        
+        if (detailsBox.classList.contains('expanded')) {
+            textSpan.textContent = 'Hide detailed steps';
+        } else {
+            textSpan.textContent = 'Show detailed steps';
+        }
+    }
+</script>
+
+
+
+<div id="threejs-container" style="width: 400px; height: 300px; position: relative; left: 50%; transform: translateX(-50%);"></div>
+<script type="module" src="atom2.js"></script>
+
+    <input id="threshold-slider" type="range" min="0" max="1" step="0.1" value="0.1" style="position:relative; top:0px; left:0px; width:200px;">
+    <label id="threshold-label" for="threshold-slider" style="position:relative; top:0px; left:0px; color:rgb(0, 0, 0);">Threshold: 0</label>
+    
+    <input id="n-slider" type="range" min="1" max="5" step="1" value="1" style="position:relative; top:0px; left:0px; width:200px;">
+    <label id="n-label" for="n-slider" style="position:relative; top:0px; left:0px; color:rgb(0, 0, 0);">n: 1</label>
+
+    <input id="l-slider" type="range" min="0" max="0" step="1" value="0" style="position:relative; top:0px; left:0px; width:200px;">
+    <label id="l-label" for="l-slider" style="position:relative; top:0px; left:0px; color:rgb(0, 0, 0);">l: 0</label>
+
+    <input id="m-slider" type="range" min="0" max="0" step="1" value="0" style="position:relative; top:0px; left:0px; width:200px;">
+    <label id="m-label" for="m-slider" style="position:relative; top:0px; left:0px; color:rgb(0, 0, 0);">m: 0</label>
+
+</body>
+
+
+
+</html>

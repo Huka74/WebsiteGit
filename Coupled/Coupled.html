@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 1</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.9.0/lib/browser/math.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.css">
+    <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js">
+    </script>
+
+    <link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+
+\(\definecolor{green}{RGB}{105,156,82}\)
+\(\definecolor{blue}{RGB}{35,107,142}\)
+\(\definecolor{red}{RGB}{207,80,68}\)
+\(\definecolor{yellow}{RGB}{232,193,28}\)
+\(\definecolor{orange}{RGB}{199,141,70}\)
+
+
+<div class="main-content">
+
+    
+
+    <h1>Coupled systems</h1>
+    <p>This is the content for Part 1.</p>
+    <a href="/Home/index.html">Back to Home</a>
+
+    Let \(m_1\) and \(m_2\) be two masses attached to two opposite walls and each other with springs.
+    The stiffness of the springs are \(k_0,k_1,k_2\), and their equilibirum lengths \(L_0,L_1,L_2\).
+    We set the distance separating the two walls to be \(L=L_0+L_1+L_2\). <br>
+    Below is an animation showing the dynamic of the system. You can drag and release the masses to
+    change the initial condition.
+
+    <div id="p5-container-meca-coupled-trim"
+    data-show="0"
+    style="position: relative; height:200px; width:600px; left:25%; top:0px;">
+    </div>
+
+    Finding the evolution of the system might seem complicated, where the dynamic of the first
+    mass influence the second, and vice-versa, but with a bit of algebra, we can broke down the system
+    into simple harmonic motions.<br><br>
+
+    The equations of motion are 
+    \[
+    \begin{array}{l}
+    m_1\ddot{x}_1 = -k_0(x_1-L_0) \hspace{0.95cm} +k_1(x_2-x_1-L_1)\\
+    m_2\ddot{x}_2 = -k_2(x_2-L_0-L_1) -k_1(x_2-x_1-L_1)\\ 
+    \end{array}
+    \]
+    As often when solving for the motion, it is usefull to change the variables to take the origin
+    at the equilibirum position : \(x_1 \leftarrow x_1-L_0, \:\: x_2 \leftarrow x_2-L_0-L_1\). 
+    The equations of motion becomes
+    \[
+    \begin{array}{l}
+    m_1\ddot{x}_1 = -k_0x_1 +k_1(x_2-x_1)\\
+    m_2\ddot{x}_2 = -k_2x_2-k_1(x_2-x_1)\\ 
+    \end{array}
+    \]
+    Given the form of the equations, it is natural to rewrite the system of differential equations
+    in a matrix form.
+    \[
+    \left(\begin{array}{cc} 
+    \ddot{x}_1\\ \ddot{x}_2
+    \end{array}\right) = 
+    \left(\begin{array}{cc} 
+    -\frac{k_0+k_1}{m_1} & \frac{k_1}{m_1}\\
+    \frac{k_1}{m_2} & -\frac{k_1+k_2}{m_2}
+    \end{array}\right)
+    \left(\begin{array}{cc} 
+    x_1\\ x_2
+    \end{array}\right)
+    \]
+    \[
+    \ddot{\mathbf{X}} = A\mathbf{X}
+    \]
+
+    Diagonalizing the matrix A with the transition matrix \(P\) would give us new coordinates \(\mathbf{Q}=P^{-1}\mathbf{X}\),
+    that evolve according to 
+    \[
+    \begin{array}{ccc}
+    P^{-1}\ddot{\mathbf{X}} & = & P^{-1}AP &  P^{-1}\mathbf{X}\\
+    \ddot{\mathbf{Q}} & = & D & \mathbf{Q}
+    \end{array}
+    \]
+    \[
+    \left(\begin{array}{cc} 
+    \ddot{Q}_1\\ \ddot{Q}_2
+    \end{array}\right) = 
+    \left(\begin{array}{cc} 
+    \lambda_1 & 0\\
+    0 & \lambda_2
+    \end{array}\right)
+    \left(\begin{array}{cc} 
+    Q_1\\ Q_2
+    \end{array}\right)
+    \]
+    In other words, with these new variables the equation of motions only involves 
+    one variable at a time, meaning that the dynamic is now decoupled !<br>
+    Moreover, it is easy to solve for \(Q_1\) and \(Q_2\) given the sign of the eigenvalues.<br>
+    Indeed, the three cases are : <br>
+    \(\bullet\quad \lambda > 0\), \(Q(t)=Ae^{\sqrt{\lambda}x}+Be^{-\sqrt{\lambda}x}\)<br>
+    \(\bullet\quad \lambda=0\), \(Q(t)=A+Bt\)<br>
+    \(\bullet\quad \lambda &lt; 0\), \(Q(t)=A\cos(\sqrt{-\lambda}x)+B\sin(\sqrt{-\lambda}x)\)<br>
+    Notice that  only \(\lambda&lt;0\) gives <b>bounded</b> solutions.<br><br>
+
+    In our case, \(\text{det}(A) > 0\) and \(\text{Tr}(A)&lt;0\), so both eigenvalues are negative.<br>
+    <div class="collapsible-trigger" onclick="toggleDetails(this)">
+        <span class="arrow">▶</span>
+        <span>Show detailed</span>
+    </div>
+    <div class="details-box">
+        Recall that the trace and the determinant is respectively the sum and the product
+        of the eigenvalues.
+        \[
+        \text{Tr}(A) = \sum_{i=1}^n\lambda_i \qquad \qquad
+        \text{det}(A) = \prod_{i=1}^n\lambda_i
+        \]
+        For a \(2\times2\) matrix, knowing the sign of those two quantities gives us enough
+        information to get the signs of the eigenvalues. In our case, having a positive determinant
+        means that both eigenvalues have the same sign, and the sign is given by the trace.<br><br>
+        
+        Here is a table summarizing the different cases. (We can always rename the eigenvalues such that \(|\lambda_1|\le|\lambda_2|\))
+        \[
+        \begin{array}{|c|c|c|c|}
+        \hline
+        & \text{Tr}>0 & \text{Tr}=0 & \text{Tr}&lt;0\\
+        \hline
+        \text{det}>0 & \lambda_1>0,\lambda_2>0 & \text{impossible} & \lambda_1&lt;0,\lambda_2&lt;0\\
+        \hline
+        \text{det}=0 & \lambda_1=0,\lambda_2>0 & \lambda_1=0,\lambda_2=0 & \lambda_1=0,\lambda_2&lt;0\\
+        \hline
+        \text{det} &lt;0 & \lambda_1&lt;0,\lambda_2>0 & \lambda_1=-\lambda_2&lt;0 & \lambda_1>0,\lambda_2&lt;0\\
+        \hline
+        \end{array}
+        \]
+        <b>Important</b>: this is valid <b>only</b> for real eigenvalues.<br>
+        For example, \(\text{det}>0\) and \(\text{Tr}=0\) is possible with \(\lambda_1=i\alpha\) and \(\lambda_2=-i\alpha\)
+    </div>
+    Writing \(\lambda_i = -\omega_i^2\) to explicitly show the sign, one can see in the equations of motion
+    that the eigenvalues are related to the frequencies of harmonic motions.
+    \[
+    \begin{array}{cc} 
+    Q_1(t)=Q_{1_0}\cos(\omega_1t)+\frac{V_{1_0}}{\omega_1}\sin(\omega_1t) \\
+    Q_2(t)=Q_{2_0}\cos(\omega_2t)+\frac{V_{2_0}}{\omega_2}\sin(\omega_2t)
+    \end{array}
+    \]
+
+    After diagonalization, we can get the frequencies \(\omega_1=\sqrt{\beta-\gamma}\), \(\:\omega_2=\sqrt{\beta+\gamma}\)<br>
+    denoting \(\alpha=\frac{1}{2}\left(\frac{k_0+k_1}{m_1}-\frac{k_1+k_2}{m_2}\right)\), \(\beta=\frac{1}{2}\left(\frac{k_0+k_1}{m_1}+\frac{k_1+k_2}{m_2}\right)\)
+    and \(\gamma=\sqrt{\alpha^2+\frac{k_1^2}{m_1m_2}}\).<br>
+    It also gives us the transition matrix \(P\), allowing us to go from the original to the normal coordinates.<br>
+    \[
+        P = \left(\begin{array}{c} 
+        (\alpha-\gamma) & (\alpha+\gamma)\\
+        -\frac{k_1}{m_2} & -\frac{k_1}{m_2}\\
+        \end{array}\right) \qquad
+        P^{-1} = \frac{1}{2\gamma}\left(\begin{array}{c} 
+        -1 & -\frac{m_2}{k_1}(\alpha+\gamma)\\
+        1 & \frac{m_2}{k_1}(\alpha-\gamma)\\
+        \end{array}\right)
+        \]
+    Using \(\mathbf{Q}_0 = P^{-1}\mathbf{X}_0\), we can find the initial condition for the normal coordinates
+    and find the their full evolution
+    \[
+    \begin{align} 
+    Q_1(t)=\left((\alpha-\gamma)x_{1_0} - \frac{k_1}{m_2}x_{2_0}\right)\cos(\omega_1t)+\frac{1}{\omega_1}\left((\alpha-\gamma)v_{1_0} - \frac{k_1}{m_2}v_{2_0}\right)\sin(\omega_1t) \\
+    Q_2(t)=\left((\alpha+\gamma)x_{1_0} - \frac{k_1}{m_2}x_{2_0}\right)\cos(\omega_2t)+\frac{1}{\omega_2}\left((\alpha+\gamma)v_{1_0} - \frac{k_1}{m_2}v_{2_0}\right)\sin(\omega_2t)
+    \end{align}
+    \]
+    Finally, using \(\mathbf{X} = P\mathbf{Q}\), we get the solution of the problem.
+    \[
+    \begin{array}{l}
+    x_1(t) = \frac{1}{2\gamma}\left(Q_2(t)-Q_1(t)\right)\\
+    x_2(t) = \frac{1}{2\gamma}\frac{m_2}{k_1}\left((\alpha-\gamma)Q_2(t)-(\alpha+\gamma)Q_1(t)\right)
+    \end{array}
+    \]
+
+    <!-- Regarding the associated eigenvectors, we get
+    \[
+    \begin{array}{l}
+    Q_1(t) = (\alpha-\gamma)x_1(t) - \frac{k_1}{m_2}x_2(t)\\
+    Q_2(t) = (\alpha+\gamma)x_1(t) - \frac{k_1}{m_2}x_2(t)
+    \end{array}
+    \]
+    Using this, the expression for the initial conditions of \(Q_1\) and \(Q_2\) can be found
+    \[
+    \begin{array}{l}
+    Q_{1_0} = (\alpha-\gamma)x_{1_0} - \frac{k_1}{m_2}x_{2_0}  &  V_{1_0} = (\alpha-\gamma)v_{1_0} - \frac{k_1}{m_2}v_{2_0}\\
+    Q_{2_0} = (\alpha+\gamma)x_{1_0} - \frac{k_1}{m_2}x_{2_0}  &  V_{2_0} = (\alpha+\gamma)v_{1_0} - \frac{k_1}{m_2}v_{2_0}
+    \end{array}
+    \] -->
+
+    <div class="collapsible-trigger" onclick="toggleDetails(this)">
+        <span class="arrow">▶</span>
+        <span>Show detailed steps</span>
+    </div>
+    <div class="details-box">
+        Details for the diagonalization of A:
+        \[ A = \left(\begin{array}{cc} 
+        -\frac{k_0+k_1}{m_1} & \frac{k_1}{m_1}\\
+        \frac{k_1}{m_2} & -\frac{k_1+k_2}{m_2}
+        \end{array}\right)\]
+
+        The characteristic polynomial is
+        \[\text{det}(A-\lambda\mathbb{1}) = \lambda^2+\left(\frac{k_0+k_1}{m_1}+\frac{k_1+k_2}{m_2}\right)\lambda+\frac{(k_0+k_1)(k_1+k_2)-k_1^2}{m_1m_2}=0\]
+        Solving for \(\lambda\) gives (introducing \(\alpha,\beta\) and \(\gamma\) for clarity)
+        \[
+        \begin{split} 
+        \lambda_{\pm} & =-\frac{1}{2}\left(\frac{k_0+k_1}{m_1}+\frac{k_1+k_2}{m_2}\right)\pm\sqrt{\frac{1}{4}\left(\frac{k_0+k_1}{m_1}+\frac{k_1+k_2}{m_2}\right)^2-\frac{(k_0+k_1)(k_1+k_2)}{m_1m_2}+\frac{k_1^2}{m_1m_2}}\\
+        & =-\underbrace{\frac{1}{2}\left(\frac{k_0+k_1}{m_1}+\frac{k_1+k_2}{m_2}\right)}_{\beta}\pm
+        \underbrace{\sqrt{\left(\underbrace{\frac{1}{2}\left(\frac{k_0+k_1}{m_1}-\frac{k_1+k_2}{m_2}\right)}_{\alpha}\right)^2+\frac{k_1^2}{m_1m_2}}}_{\gamma}\\
+        & = -\beta\pm\gamma
+        \end{split}\]
+        
+
+        \[
+        A-\lambda_-\mathbb{1} = \left(\begin{array}{cc} 
+        -\alpha+\gamma & \frac{k_1}{m_1}\\
+        \frac{k_1}{m_2} & \alpha+\gamma
+        \end{array}\right) \Longrightarrow
+        \mathbf{v}_- = \left(\begin{array}{c} 
+        \alpha+\gamma\\
+        -\frac{k_1}{m_2}
+        \end{array}\right)
+        \]
+        \[
+        A-\lambda_+\mathbb{1} = \left(\begin{array}{cc} 
+        -\alpha-\gamma & \frac{k_1}{m_1}\\
+        \frac{k_1}{m_2} & \alpha-\gamma
+        \end{array}\right) \Longrightarrow
+        \mathbf{v}_+ = \left(\begin{array}{c} 
+        \alpha-\gamma\\
+        -\frac{k_1}{m_2}
+        \end{array}\right)
+        \]
+
+        The transition matrix and its inverse are 
+        \[
+        P = \left(\begin{array}{c} 
+        (\alpha-\gamma) & (\alpha+\gamma)\\
+        -\frac{k_1}{m_2} & -\frac{k_1}{m_2}\\
+        \end{array}\right) \qquad
+        P^{-1} = \frac{1}{2\gamma}\left(\begin{array}{c} 
+        -1 & -\frac{m_2}{k_1}(\alpha+\gamma)\\
+        1 & \frac{m_2}{k_1}(\alpha-\gamma)\\
+        \end{array}\right)
+        \]
+
+        With this, we can switch between the original and normal coordinates
+        \[
+        \begin{align}
+        \mathbf{X} & = P\mathbf{Q} \qquad & \mathbf{Q}  & = P^{-1}\mathbf{X}\\
+        x_1(t) & = \frac{1}{2\gamma}\left(Q_2(t)-Q_1(t)\right) \qquad & Q_1(t) & = (\alpha-\gamma)x_1(t) - \frac{k_1}{m_2}x_2(t)\\
+        x_2(t) & = \frac{1}{2\gamma}\frac{m_2}{k_1}\left((\alpha-\gamma)Q_2(t)-(\alpha+\gamma)Q_1(t)\right) \qquad & Q_2(t) & = (\alpha+\gamma)x_1(t) - \frac{k_1}{m_2}x_2(t)
+        \end{align}
+        \]
+        
+    </div>
+
+    
+    
+
+    
+
+</div>
+
+<div class="main-content"></div>
+
+<div id="p5-container-meca-coupled" style="position: relative; height:600px; width:600px; left:25%; top:0px;">
+</div>
+
+<div id="p5-container-doublependulum" style="position: relative; height:600px; width:600px; left:25%; top:0px;">
+</div>
+
+<script>
+    function toggleDetails(trigger) {
+        const arrow = trigger.querySelector('.arrow');
+        const detailsBox = trigger.nextElementSibling;
+        const textSpan = trigger.querySelector('span:last-child');
+        
+        arrow.classList.toggle('expanded');
+        detailsBox.classList.toggle('expanded');
+        
+        if (detailsBox.classList.contains('expanded')) {
+            textSpan.textContent = 'Hide detailed steps';
+        } else {
+            textSpan.textContent = 'Show detailed steps';
+        }
+    }
+</script>
+
+
+
+</div>
+</body>
+
+<script src="/Coupled/coupled.js"></script>
+<script src="/Coupled/doublependulum.js"></script>
+<script src="/utils.js"></script>
+<script src="/UIObjects.js"></script>
+
+</html>

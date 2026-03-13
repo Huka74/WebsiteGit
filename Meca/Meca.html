@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 1</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.9.0/lib/browser/math.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.css">
+    <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js">
+    </script>
+    
+
+    <!-- <link rel="stylesheet" type="text/css"
+    href="https://cdn.rawgit.com/dreampulse/computer-modern-web-font/master/fonts.css"> -->
+    <!--  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Latin+Modern+Roman&display=swap">  -->
+    <!--  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/computer-modern@0.1.2/cmu-serif.css">  -->
+
+    <link rel="stylesheet" href="/style.css">
+
+</head>
+
+<div style="display:none">
+\(\definecolor{green}{RGB}{105,156,82}\)
+\(\definecolor{blue}{RGB}{35,107,142}\)
+\(\definecolor{red}{RGB}{207,80,68}\)
+\(\definecolor{yellow}{RGB}{232,193,28}\)
+\(\definecolor{orange}{RGB}{199,141,70}\)
+</div>
+
+
+<body>
+    <script src="/navbar.js"></script>
+
+<div class="main-content">
+
+
+    <h1>Mechanic</h1>
+    <p>This is the content for Part 1.</p>
+    <a href="/Home/index.html">Back to Home</a>
+    
+    <p>
+        Let's take as an example a point of mass \(\textcolor{green}{m}\), restricted to move on a circle of radius \(L\), subject to gravity \(\textcolor{blue}{\vec{g}}\).
+        Let's also add a spring of stiffness \(\textcolor{red}{k}\) attached to the mass and a point at a distance \(\textcolor{orange}{d}\) above the center of the circle.
+    </p>
+
+</div>
+
+
+<div id="p5-container-meca" style="position: relative; height:600px; width:600px; left:25%; top:0px;">
+</div>
+
+<div class="main-content">
+    Given the restriction of the mass to move on the circle, a natural parametrisation of its position is by its angle \(\theta\).
+    Taking as origin the center of the circle, the position of the mass is \(
+    \textbf{x} = L\left(\begin{array}{c}
+    \sin\theta \\
+    -\cos\theta \\
+    \end{array}\right)\). The coordinate of the other end of the spring is \(
+    \left(\begin{array}{c}
+    0 \\
+    L+d \\
+    \end{array}\right)\). The length of the spring is then
+    \[
+    l(\theta) = \left|\left(\begin{array}{c}
+    L\sin\theta \\
+    -L\cos\theta \\
+    \end{array}\right) - 
+    \left(\begin{array}{c}
+    0 \\
+    L+d \\
+    \end{array}\right)\right| = \sqrt{L^2\sin^2\theta + \left(L\cos\theta+L+d\right)^2}
+     = \sqrt{L^2+(L+d)^2+2L(L+d)\cos\theta}\]
+
+    With this we can write the potential energy:
+    
+    \[
+    \begin{split}
+    V(\theta) & = E_{\textcolor{red}{k}}(\theta)+E_{\textcolor{blue}{g}}(\theta)\\
+    & = \frac{1}{2}\textcolor{red}{k}(l(\theta)-l_0)^2-m\textcolor{blue}{g}L\cos\theta\\
+    & = \frac{1}{2}\textcolor{red}{k}\left(\sqrt{L^2+(L+d)^2+2L(L+d)\cos\theta}-l_0\right)^2-m\textcolor{blue}{g}L\cos\theta\\
+    \end{split}
+    \]
+
+    And deriving it, we find:
+
+    \[
+    \begin{split}
+    \frac{\mathrm{d}V}{\mathrm{d}\theta} & = 
+    \frac{-L(L+d)\sin\theta}{\sqrt{L^2+(L+d)^2+2L(L+d)\cos\theta}}\textcolor{red}{k}\left(\sqrt{L^2+(L+d)^2+2L(L+d)\cos\theta}-l_0\right)
+    +m\textcolor{blue}{g}L\sin\theta\\
+    & = L\sin\theta\left(m\textcolor{blue}{g}-(L+d)\textcolor{red}{k}\left(1-\frac{l_0}{\sqrt{L^2+(L+d)^2+2L(L+d)\cos\theta}}\right)\right)
+    \end{split}
+    \]
+
+    Analyzing the stationnary points, we set \(\frac{\mathrm{d}V}{\mathrm{d}\theta}=0\). Having quite a bit of parameters, we will analyze the stationnary points step by step.
+
+    <br><br>Trivial case: \(\textcolor{red}{k}=0, \textcolor{blue}{g}=0\)<br><br>
+
+    Removing all forces acting on the mass leave it free to move on the circle. You can see on the <a href="#p5-container-meca" class="custom-link">canvas</a> that the potential is constant, and so the particle moves freely (appart from friction added to the simulation).
+
+    <br><br>Second case: \(\textcolor{red}{k}=0, \textcolor{blue}{g}\ne0\)<br><br>
+
+    This is a simple pendulum, with potential \(V(\theta) = -mgL\cos\theta\). The stationnary positions are \(\theta = 0,\pi\), at the bottom and the top of the circle.
+    Considering the stability of those points, we need to look at the sign of the second derivative of the potential.
+    \(\frac{\mathrm{d}^2V}{\mathrm{d}\theta^2}(\theta) = mgl\cos\theta, \quad \frac{\mathrm{d}^2V}{\mathrm{d}\theta^2}(0) > 0, \quad \frac{\mathrm{d}^2V}{\mathrm{d}\theta^2}(\pi) < 0\)
+    So, as expected, the bottom is stable and the top is unstable.
+
+    <br><br>Third case: \(\textcolor{red}{k}\ne0, \textcolor{blue}{g}=0\)<br><br>
+
+    This case is more interesting, as it shows how stability analysis can tell you how changing a parameter can make a stable stationnary point, instable, and vice-versa.<br>
+    
+
+    <br><br>General case: \(\textcolor{red}{k}\ne0, \textcolor{blue}{g}=0\)<br><br>
+
+    Two simple solutions are \(\theta = 0,\pi\), at the bottom and the top of the circle.
+
+</div>
+</body>
+
+
+<script src="/Meca/meca.js"></script>
+<!-- <script src="pendulum.js"></script> -->
+ <script src="/UIObjects.js"></script>
+<script src="/utils.js"></script>
+
+</html>

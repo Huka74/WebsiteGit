@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 1</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.9.0/lib/browser/math.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.css">
+    <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js">
+    </script>
+
+    <link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+<script src="/navbar.js"></script>
+
+<!-- \(\definecolor{green}{RGB}{105,156,82}\)
+\(\definecolor{blue}{RGB}{35,107,142}\)
+\(\definecolor{red}{RGB}{207,80,68}\)
+\(\definecolor{yellow}{RGB}{232,193,28}\)
+\(\definecolor{orange}{RGB}{199,141,70}\) -->
+
+
+<div class="main-content">
+
+    
+
+    <h1>Catenary/Hanging chain</h1>
+
+    <a id="p5-container-catenary-link"></a>
+    <div id="p5-container-catenary"
+    style="position: relative; height:400px; width:600px; left: 50%; transform: translate(-50%, 0%);">
+    </div>
+
+    Check <a href="/Lagrangian/Lagrangian.html">Euler-Lagrange</a> for the derivation of the Euler-Lagrange equations.<br><br>
+    In this post, we will use the Euler-Lagrange equations to find the shape of a hanging chain.<br><br>
+
+    Looking at power lines, or hanging chain, a natural question is "what shape does the chain takes ?".<br>
+    One might be temped to say a parabola, but as we will see here, it is in fact a hyperbolic cosine.<br>
+    Let's properly state the problem: <br>
+    We have a chain of length \(L\) and uniform (linear) density \(\rho\), 
+    with both ends attached to \(x_0,y_0\) and \(x_1,y_1\). It is subject to
+    a constant gravitationnal field \(g\). What is the shape of the chain ?<br><br>
+
+    To find the physically correct shape, we need to find the one that minimize the potential energy.
+
+    \begin{equation}
+    E[y] = \int \rho gy ds
+    \end{equation}
+
+    We also have to impose that the length is \(L\)
+    \begin{equation}
+    \int ds = L
+    \end{equation}
+
+    We need to find \(y(x)\) that minimize the energy \(E[y]\) under the constraint \(\int ds = L\).
+    Introducing Lagrange multiplier, we need to minimize  
+    \begin{equation}
+    S = \int \rho g y ds - \lambda\left(\int ds - L\right) = \rho g\int \left(y-\frac{\lambda}{\rho g}\right) ds +\lambda L
+    \end{equation}
+
+    Just like in the Brachistochrone problem, we have to decide wether
+    to write \(ds=\sqrt{1+y(x)'^2}dx\) and consider \(y\) to be a function of \(x\) or 
+    to write \(ds=\sqrt{1+x(y)'^2}dy\) and consider \(x\) to be a function of \(y\).
+    The natural choice seems to be \(y(x)\), but once again, choosing \(x(y)\) will greatly simplify
+    the following.
+
+    \begin{equation}
+    S =  \rho g \int   \left(y-\frac{\lambda}{\rho g}\right) \sqrt{1+x(y)'^2} dy
+    \end{equation}
+
+    Using the Euler-Lagrange equation with \(y\) taking the role of \(t\), and renaming the constant
+    \(\frac{\lambda}{\rho g}=a\), gives
+
+    \begin{equation}
+    \frac{\mathrm{d}}{\mathrm{d}y}\frac{\partial}{\partial x'}\left((y-a)\sqrt{1+x'^2}\right)
+     - \frac{\partial}{\partial x}\left((y-a)\sqrt{1+x'^2}\right) = 0
+    \end{equation}
+    Thanks to the choice \(x(y)\), the second part gives 0, leaving only:
+    \begin{equation}
+    \frac{\mathrm{d}}{\mathrm{d}y}\frac{\partial}{\partial x'}\left((y-a)\sqrt{1+x'^2}\right) = 0
+    \quad \Longrightarrow \quad \frac{(y-a)x'}{\sqrt{1+x'^2}}=b
+    \end{equation}
+
+    After isolating \(x'\), we have
+    \begin{equation}
+    x'(y)=\frac{1}{\sqrt{\left(\frac{y-a}{b}\right)^2-1}}
+    \end{equation}
+
+    We can now integrate over \(y\) to get \(x(y)\) and invert it to get \(y(x)\)
+
+    \begin{equation}
+    x(y)=b\text{ arccosh}\left(\frac{y-a}{b}\right)+c \quad \Longrightarrow \quad y(x)=b\cosh\left(\frac{x-c}{b}\right)+a
+    \end{equation}
+
+    with \(a\), \(b\) and \(c\) integration constants, fixed by imposing the boundary condition
+    (fixing the ends of the chain) and imposing that the length is \(L\).
+    \begin{equation}
+    \left\{\begin{array}{l}
+    y_0 = a+b\cosh\left(\frac{x_0-c}{b}\right)\\
+    y_1 = a+b\cosh\left(\frac{x_1-c}{b}\right)\\
+    L = \int_{x_0}^{x_1} \sqrt{1+y'^2}dx = \left.b\sinh\left(\frac{x-c}{b}\right)\right|_{x_0}^{x_1}
+    \end{array}\right.
+    \end{equation}
+
+    Solving this gives
+
+    \begin{equation}
+    \left\{\begin{array}{l}
+    2b\sinh\left(\frac{x_1-x_0}{2b}\right) = \sqrt{L^2-(y_1-y_0)^2}\\
+    c = \frac{x_1+x_0}{2}-b\text{ arctanh}\left(\frac{y_1-y_0}{L}\right)\\
+    a = y_0-b\cosh\left(\frac{x_0-c}{b}\right)
+    \end{array}\right.
+    \end{equation}
+
+    Once we find \(b\) with the first equation, \(c\) can be found with the second, and \(a\) with the third one.
+    However, \(b\) can not be found analytically, and is solve numerically in the <a href="#p5-container-catenary-link" class="custom-link">animation</a>.<br><br>
+
+    Notice that the sign of \(b\) is not fixed by the first equation, 
+    since replacing \(b\) with \(-b\) leaves it unchanged. <br>
+    In fact, the system possesses the symmetry:
+
+    \begin{equation}
+    (a,b,c) \mapsto (y_0+y_1-a, -b, x_0+x_1-c)
+    \end{equation}
+
+    Therefore, if \((a,b,c)\) is a solution, then \((y_0+y_1-a, -b, x_0+x_1-c)\)
+    is also a solution, one with the chain going downward and one upward.
+    Geometrically, the second configuration is obtained from the first by the transformation
+
+    \begin{equation}
+    (x,y) \mapsto (x_0+x_1-x,y_0+y_1-y)
+    \end{equation}
+
+    which is the central symmetry about the mid point \(\left(\frac{x_0+x_1}{2},\frac{y_0+y_1}{2}\right)\).<br><br>
+    
+    It is easy to see that the true physical solution is the one with \(b\ge 0\), with the chain hanging below the two points.
+    In fact \(b\ge 0\) correspond to the minimum of the action, whereas \(b\le 0\) correspond to the maximum.<br>
+    To rigorously fix the sign of \(b\), one can check the stability of the solution of the Euler-Lagrange equation,
+    i.e. if it is a minimum or a maximum.
+    To do so, we can use the Legendre-Clebsch condition, stating that for a minimization problem 
+
+    \begin{equation}
+    S = \int_{t_0}^{t_1} \mathcal{L}(t,x,\dot{x}) dt
+    \end{equation}
+
+    The solution \(x(t)\) is a minimum if 
+    \begin{equation}
+    \frac{\partial^2 \mathcal{L}}{\partial x'^2} \ge 0 \quad \forall t\in [t_0,t_1]
+    \end{equation}
+
+    In our case, \(\mathcal{L} = \rho g(y-a)\sqrt{1+x'^2}\) and \(y(x)=a+b\cosh\left(\frac{x-c}{b}\right)\),
+    \begin{equation}
+    \begin{split}
+    \frac{\partial^2 \mathcal{L}}{\partial x'^2} & = \frac{\rho g(y-a)}{(1+x'^2)^{\frac{3}{2}}} \ge 0\\
+    & \Longrightarrow \rho g b\cosh\left(\frac{x-c}{b}\right) \ge 0\\
+    & \Longrightarrow \text{sign}(b) = \text{sign}(g)\\
+    \end{split}
+    \end{equation}
+
+    thus, fixing our last degree of freedom.
+    
+
+</div>
+
+
+
+<script>
+    function toggleDetails(trigger) {
+        const arrow = trigger.querySelector('.arrow');
+        const detailsBox = trigger.nextElementSibling;
+        const textSpan = trigger.querySelector('span:last-child');
+        
+        arrow.classList.toggle('expanded');
+        detailsBox.classList.toggle('expanded');
+        
+        if (detailsBox.classList.contains('expanded')) {
+            textSpan.textContent = 'Hide detailed steps';
+        } else {
+            textSpan.textContent = 'Show detailed steps';
+        }
+    }
+</script>
+
+
+
+</div>
+</body>
+
+<script src="Catenary.js"></script>
+<script src="/utils.js"></script>
+<script src="/UIObjects.js"></script>
+
+</html>
