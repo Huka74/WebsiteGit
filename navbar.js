@@ -2,23 +2,23 @@ document.write(`
   <nav>
 
   <div class="nav-left">
-    <a href="/Home/index.html">Home</a>
+    <a href="Home/index.html">Home</a>
 
     <div class="dropdown">
       <span>Pages ▾</span>
         <div class="dropdown-content">
           <div style="position:relative; left:5px">
             Meca
-            <a href="/Meca/Meca.html">Stationnary points</a>
+            <a href="Meca/Meca.html">Stationnary points</a>
           </div>
           <div style="position:relative; left:5px">
             Langragian mechanics
-            <a href="/Lagrangian/Brachistochrone.html">Brachistochrone</a>
-            <a href="/Lagrangian/Catenary.html">Catenary</a>
+            <a href="Lagrangian/Brachistochrone.html">Brachistochrone</a>
+            <a href="Lagrangian/Catenary.html">Catenary</a>
           </div>
           <div style="position:relative; left:5px">
             Other
-            <a href="/Hydrogen/Hydrogen.html">Hydrogen atom</a>
+            <a href="Hydrogen/Hydrogen.html">Hydrogen atom</a>
           </div>
           
           
