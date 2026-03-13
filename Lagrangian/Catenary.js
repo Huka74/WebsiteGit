@@ -1,6 +1,8 @@
 let SketchCatenary = (containerId) => (p) => {
-let w = 600;
-let h = 600;
+let w;
+let h;
+let translation;
+let scaling = [1,-1];
 
 let dragging = false;
 let UIObjects = [];
@@ -27,6 +29,7 @@ p.setup = function() {
 
   w = container.clientWidth
   h = container.clientHeight
+  translation = [w/2,h/2+100];
 
   bgColor = getComputedStyle(document.body).backgroundColor;
   textColor = getComputedStyle(document.body).color;
@@ -96,9 +99,6 @@ p.handleDrag_f = function(obj){
 
 
 //////// DRAW ////////
-
-let translation = [w/2,h/2];
-let scaling = [1,-1];
 
 p.draw = function() {
   bgColor = getComputedStyle(document.body).backgroundColor;
@@ -300,7 +300,7 @@ p.mouseDragged = function(){
     draggedObject.handleDrag(mousePos[0], mousePos[1]);
   }
 
-  return false;
+  // return false;
 }
 
 p.mouseReleased = function(){
