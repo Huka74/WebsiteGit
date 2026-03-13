@@ -1,12 +1,14 @@
-// const base = document.createElement('base');
-// base.href = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-//   ? '/'
-//   : '/WebsiteGit/';
-// document.head.prepend(base);
+
 
 document.write(`
 
-  <script src="navbar.js"></script>
+  const base = document.createElement('base');
+base.href = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? '/'
+  : '/WebsiteGit/';
+document.head.prepend(base);
+
+
   <nav>
 
   <div class="nav-left">
