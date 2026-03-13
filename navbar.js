@@ -6,6 +6,7 @@
 
 document.write(`
 
+  <script src="navbar.js"></script>
   <nav>
 
   <div class="nav-left">
