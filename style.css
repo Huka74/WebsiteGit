@@ -9,9 +9,9 @@ html, body {
   font-family: 'CMU Serif', serif;
 }
 
-* {
+/* * {
   outline: 1px solid red;
-}
+} */
 
 body.dark-theme {
   --text-color: #f0f0f0;

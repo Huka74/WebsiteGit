@@ -1,24 +1,31 @@
+const base = document.createElement('base');
+base.href = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? '/'
+  : '/WebsiteGit/';
+document.head.prepend(base);
+
 document.write(`
+
   <nav>
 
   <div class="nav-left">
-    <a href="../index.html">Home</a>
+    <a href="index.html">Home</a>
 
     <div class="dropdown">
       <span>Pages ▾</span>
         <div class="dropdown-content">
           <div style="position:relative; left:5px">
             Meca
-            <a href="../Meca/Meca.html">Stationnary points</a>
+            <a href="/Meca/Meca.html">Stationnary points</a>
           </div>
           <div style="position:relative; left:5px">
             Langragian mechanics
-            <a href="../Lagrangian/Brachistochrone.html">Brachistochrone</a>
-            <a href="../Lagrangian/Catenary.html">Catenary</a>
+            <a href="/Lagrangian/Brachistochrone.html">Brachistochrone</a>
+            <a href="/Lagrangian/Catenary.html">Catenary</a>
           </div>
           <div style="position:relative; left:5px">
             Other
-            <a href="../Hydrogen/Hydrogen.html">Hydrogen atom</a>
+            <a href="/Hydrogen/Hydrogen.html">Hydrogen atom</a>
           </div>
           
           
@@ -27,7 +34,7 @@ document.write(`
     </div>
 
     <div class="nav-left">
-      <a href="../index.html">About</a>
+      <a href="index.html">About</a>
       <div class="toggle-switch" id="toggleSwitch">
 
         <div class="toggle-icon-moon"></div>
