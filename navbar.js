@@ -27,7 +27,7 @@ document.write(`
     </div>
 
     <div class="nav-left">
-      <a href="Home/index.html">About</a>
+      <a href="index.html">About</a>
       <div class="toggle-switch" id="toggleSwitch">
 
         <div class="toggle-icon-moon"></div>
