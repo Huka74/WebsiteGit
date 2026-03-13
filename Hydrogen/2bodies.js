@@ -2,7 +2,7 @@ let coord = (containerId) => (p) => {
 let w;
 let h;
 let translation;
-let scaling = [0.9,-0.9];
+let scaling = [0.8,-0.8];
 let r0 = 50;
 let r;
 let R = 200;

@@ -7,10 +7,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mathjs@11.9.0/lib/browser/math.js"></script>
 
-    <script>
+    <!-- <script>
         window.MathJax = {tex: {tags: 'ams'   // 'ams' | 'all' | 'none'
         }};
-   </script>
+   </script> -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.css">
@@ -19,7 +19,7 @@
     </script>  
 
 
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="../style.css">
 
     <script type="importmap">
         {
@@ -41,14 +41,14 @@
 \(\definecolor{red}{RGB}{207,80,68}\)
 \(\definecolor{yellow}{RGB}{232,193,28}\)
 \(\definecolor{orange}{RGB}{199,141,70}\) -->
-<script src="/navbar.js"></script>
+<script src="../navbar.js"></script>
 
 
 <div class="main-content">
 
     <h1>Atom</h1>
     <p>This is the content for Part 3.</p>
-    <a href="/Home/index.html">Back to Home</a>
+    <a href="../Home/index.html">Back to Home</a>
     
 
     We will solve for the electronic orbitals of the Hydrogen atom with no quatum mechanic consideration 
@@ -90,7 +90,7 @@ The button can be used to switch from the original and center of mass coordinate
 to vary the ratio of mass of the two particles. Notice in the limit of large mass ratio, \(r_p\rightarrow R, \mu\rightarrow m_e\), (in our case, \(m_p/m_e\sim1000\)) <br>
 
 <input id="mass-slider" type="range" min="0" max="1" step="0.05" value="0" style="position:relative; left: 50%; transform: translate(-50%, 0%); width:200px;">
-<div id="p5-container-coord" style="position: relative; height:350px; width:500px; left: 50%; transform: translate(-50%, 0%);"></div>
+<div id="p5-container-coord" style="position: relative; height:300px; width: 100%; max-width: 500px; margin-left: auto; margin-right: auto;"></div>
 
 Going to the quantum case, the Schrödinger equation associated to this Hamiltonian is
 \begin{equation}
@@ -133,7 +133,8 @@ Finally, we have a system of three equations, for the radial \(R(r)\), polar \(\
 \end{equation}
 
 <h2>Solving the azimuthal part</h2>
-Starting with the simplest equation, we solve for the azimuthal part:\ref{eq:syst}
+Starting with the simplest equation, we solve for the azimuthal part
+<!-- :\ref{eq:syst} -->
 \[\frac{\partial^2\Phi}{\partial\phi^2} = -\beta\Phi\qquad \Longrightarrow \qquad \Phi = Ae^{i\sqrt{\beta}\phi}+Be^{-i\sqrt{\beta}\phi}\]
 Because \(\phi\) represent the angle around the polar axis, we have to impose periodic boundary condition:
 \[\Phi(\phi) = \Phi(\phi+2\pi) \qquad \Longrightarrow \qquad \beta=m^2,\:\: m\in\mathbb{Z}\]
@@ -281,10 +282,10 @@ In the end, the solution to the electronic orbitals of the Hydrogen atom is
 with \(\rho=\frac{\mu e^2}{2\pi\epsilon_0\hbar^2 n}r=\frac{2}{a_0^* n}r\), \(\:a_0^*\) the reduced Bohr radius, \(\:\:L^{2l+1}_{n-l-1}\) being the generalized Laguerre polynomials,
 \(\:\:P_l^m\) the associated Legendre polynomials, and \(C\) the normalization constant.
 
-<script src="/Hydrogen/2bodies.js"></script>
-<script src="/Hydrogen/polarpart.js"></script>
-<script src="/utils.js"></script>
-<script src="/UIObjects.js"></script>
+<script src="../Hydrogen/2bodies.js"></script>
+<script src="..//Hydrogen/polarpart.js"></script>
+<script src="../utils.js"></script>
+<script src="../UIObjects.js"></script>
 
 <script>
     function toggleDetails(trigger) {
