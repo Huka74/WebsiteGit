@@ -81,7 +81,10 @@ void main() {
     vec4 diff = sp - s;
     float dist = length(diff);
     // if (dist > 0.0) {
-      ly.x = log(dist / u_eps/ly.y);       // accumulate log-stretch
+      float n = max(ly.y, 1.0);
+      float safeDist = max(dist, 1e-10);
+      ly.x = log(safeDist / u_eps) / n;
+      // ly.x = log(dist / u_eps/ly.y);       // accumulate log-stretch
       // ly.x = dist;
       ly.y += 1.0;
       // sp = s + diff * (u_eps / dist);  // renormalize back to epsilon
