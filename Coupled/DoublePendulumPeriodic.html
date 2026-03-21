@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 1</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.9.0/lib/browser/math.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.css">
+    <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js">
+    </script>
+
+
+    <base href="/WebsiteGit/">
+    <!-- <base href="/"> -->
+    <script src="navbar.js"></script>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+
+
+<!-- \(\definecolor{green}{RGB}{105,156,82}\)
+\(\definecolor{blue}{RGB}{35,107,142}\)
+\(\definecolor{red}{RGB}{207,80,68}\)
+\(\definecolor{yellow}{RGB}{232,193,28}\)
+\(\definecolor{orange}{RGB}{199,141,70}\) -->
+
+
+<div class="main-content">
+
+    
+
+    <h1>Double Pendulum</h1>
+
+    <br><br><br><br><br>
+
+    <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* body {
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Courier New', monospace;
+    color: #aaa;
+  } */
+  /* canvas { display: block; image-rendering: pixelated; } */
+  canvas { touch-action: none; }
+  #ui {
+    margin-top: 14px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    /* font-size: 12px;
+    letter-spacing: 0.08em; */
+  }
+  label { display: flex; align-items: center; gap: 8px; }
+  input[type=range] { width: 120px; accent-color: #2196F3; }
+  button {
+    background: none;
+    border: 1px solid #555;
+    color: #aaa;
+    padding: 4px 12px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+  }
+  button:hover { border-color: #2196F3; color: #2196F3; }
+  #info { font-size: 11px; color: #555; margin-top: 8px; }
+  /* Pendulum inspector overlay */
+  #inspector {
+    display: none;
+    position: absolute;
+    background: #0d0d0d;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 10px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.8);
+    z-index: 100;
+    min-width: 220px;
+  }
+  #inspector.visible { display: block; }
+  #inspector header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    /* font-size: 11px;
+    letter-spacing: 0.1em; */
+    color: #666;
+  }
+  #inspector header span { color: #2196F3; }
+  #closeBtn {
+    cursor: pointer;
+    color: #555;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0 2px;
+  }
+  #closeBtn:hover { color: #2196F3; }
+  #pendCanvas {
+    display: block;
+    background: #050505;
+    border: 1px solid #1a1a1a;
+    border-radius: 2px;
+  }
+  #pendInfo {
+    margin-top: 8px;
+    font-size: 10px;
+    color: #555;
+    line-height: 1.7;
+  }
+  #pendInfo b { color: #888; }
+  #zoomRect {
+  position: absolute;
+  border: 1px solid #2196F3;
+  background: rgba(33,150,243,0.12);
+  pointer-events: none;
+  display: none;
+}
+#container { position: relative; }
+</style>
+</head>
+<body>
+
+<div id="container" style="width: 100%; max-width: 600px; margin-left: auto; margin-right: auto;">
+<canvas id="c"></canvas>
+<div id="ui">
+  <!-- <label>SPEED <input type="range" id="speed" min="1" max="20" value="5"></label> -->
+  <!-- <label>Scene -->
+    <select id="colormode" style="background:#111;border:1px solid #444;color:#aaa;font-family:inherit;font-size:12px;padding:2px 6px;">
+      <option value="4">flip count</option>
+      <option value="0">theta2 angle</option>
+      <option value="1">energy</option>
+      <option value="2">omega2 velocity</option>
+      <option value="3">quadrant</option>
+      <option value="5">Lyapunov exponent</option>
+    </select>
+  </label>
+  <button id="resetBtn">RESET</button>
+  <button id="zoomBtn">ZOOM</button>
+  <button id="resetZoomBtn" style="display:none">RESET ZOOM</button>
+  <div id="zoomRect"></div>
+  <span id="timer">\(t = 0.00\)</span>
+</div>
+<div id="inspector">
+  <header>
+    <span>Pendulum</span>
+    <div id="closeBtn">&#x2715;</div>
+  </header>
+  <canvas id="pendCanvas" width="180" height="180"></canvas>
+  <div id="pendInfo"></div>
+</div>
+</div>
+
+
+    where
+    <div id="p5-container-doublependulum-periodic">
+    </div>
+    to
+    
+
+</div>
+
+
+
+<script>
+    function toggleDetails(trigger) {
+        const arrow = trigger.querySelector('.arrow');
+        const detailsBox = trigger.nextElementSibling;
+        const textSpan = trigger.querySelector('span:last-child');
+        
+        arrow.classList.toggle('expanded');
+        detailsBox.classList.toggle('expanded');
+        
+        if (detailsBox.classList.contains('expanded')) {
+            textSpan.textContent = 'Hide detailed steps';
+        } else {
+            textSpan.textContent = 'Show detailed steps';
+        }
+    }
+</script>
+
+
+
+</div>
+</body>
+
+
+<script src="Coupled/DoublePendulumPeriodic.js"></script>
+<script src="utils.js"></script>
+<script src="UIObjects.js"></script>
+<script src="Coupled/PhaseSpace.js"></script>
+
+</html>

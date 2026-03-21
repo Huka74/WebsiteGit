@@ -1,129 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Double Pendulum Chaos</title>
-<script type="text/javascript" async
-src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js">
-</script>
-
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: #000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    font-family: 'Courier New', monospace;
-    color: #aaa;
-  }
-  canvas { display: block; image-rendering: pixelated; }
-  #ui {
-    margin-top: 14px;
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    font-size: 12px;
-    letter-spacing: 0.08em;
-  }
-  label { display: flex; align-items: center; gap: 8px; }
-  input[type=range] { width: 120px; accent-color: #e87; }
-  button {
-    background: none;
-    border: 1px solid #555;
-    color: #aaa;
-    padding: 4px 12px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 12px;
-    letter-spacing: 0.08em;
-  }
-  button:hover { border-color: #e87; color: #e87; }
-  #info { font-size: 11px; color: #555; margin-top: 8px; }
-  /* ── Pendulum inspector overlay ── */
-  #inspector {
-    display: none;
-    position: absolute;
-    background: #0d0d0d;
-    border: 1px solid #333;
-    border-radius: 4px;
-    padding: 10px;
-    box-shadow: 0 4px 32px rgba(0,0,0,0.8);
-    z-index: 100;
-    min-width: 220px;
-  }
-  #inspector.visible { display: block; }
-  #inspector header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    color: #666;
-  }
-  #inspector header span { color: #e87; }
-  #closeBtn {
-    cursor: pointer;
-    color: #555;
-    font-size: 14px;
-    line-height: 1;
-    padding: 0 2px;
-  }
-  #closeBtn:hover { color: #e87; }
-  #pendCanvas {
-    display: block;
-    background: #050505;
-    border: 1px solid #1a1a1a;
-    border-radius: 2px;
-  }
-  #pendInfo {
-    margin-top: 8px;
-    font-size: 10px;
-    color: #555;
-    line-height: 1.7;
-  }
-  #pendInfo b { color: #888; }
-</style>
-</head>
-<body>
-<canvas id="c"></canvas>
-<div id="ui">
-  <label>SPEED <input type="range" id="speed" min="1" max="20" value="5"></label>
-  <label>COLOR
-    <select id="colormode" style="background:#111;border:1px solid #444;color:#aaa;font-family:inherit;font-size:12px;padding:2px 6px;">
-      <option value="4">flip count</option>
-      <option value="0">theta2 angle</option>
-      <option value="1">energy</option>
-      <option value="2">omega2 velocity</option>
-      <option value="3">quadrant</option>
-    </select>
-  </label>
-  <button id="resetBtn">RESET</button>
-  <span id="timer">t = 0.00</span>
-</div>
-<div id="info">each pixel = one pendulum &middot; initial theta1 x theta2 in [-pi, pi]^2 &middot; omega0 = 0</div>
-
-<div id="inspector">
-  <header>
-    <span>PENDULUM INSPECTOR</span>
-    <div id="closeBtn">&#x2715;</div>
-  </header>
-  <canvas id="pendCanvas" width="200" height="200"></canvas>
-  <div id="pendInfo"></div>
-</div>
-
-<script>
-const SIZE = 800;
+const container = document.getElementById('container');
+// const SIZE = 600;
+const SIZE = Math.min(container.clientWidth, 800);
 const canvas = document.getElementById('c');
 canvas.width = SIZE;
 canvas.height = SIZE;
 const gl = canvas.getContext('webgl2');
 if (!gl) { alert('WebGL2 not supported'); }
 
-// ── Shaders ───────────────────────────────────────────────────────────────────
+// Shaders
 
 const VERT_SRC = `#version 300 es
 in vec2 a_pos;
@@ -216,22 +100,24 @@ void main() {
     col = hsv2rgb(vec3(norm*0.75, 0.9, 1.0));
 
   } else if (u_colorMode == 2) {
-    //float speed = clamp(abs(w2) / 15.0, 0.0, 1.0);
-    //col = hsv2rgb(vec3(0.6 - speed*0.6, 0.9, speed));
-    col = vec3(0.,0.2,0.8)+vec3(1./(w1*w1+w2*w2)/1000.,0.,0.);
+    float speed = clamp(abs(w2) / 15.0, 0.0, 1.0);
+    col = hsv2rgb(vec3(0.6 - speed*0.6, 0.9, speed));
+    // col = vec3(0.,0.2,0.8)+vec3(1./(w1*w1+w2*w2)/1000.,0.,0.);
 
   } else if (u_colorMode == 3) {
     float q = floor(mod(th2, TAU) / (PI*0.5));
     col = hsv2rgb(vec3(q/4.0, 0.8, 1.0));
 
   } else {
-    col = vec3(s.z/(2.0*PI), -s.z/(2.0*PI), 0.0); 
+    // col = vec3(s.z/(2.0*PI), -s.z/(2.0*PI), 0.0);
+    col = abs(s.z/(3.0*PI))*vec3(0., 0., 117./255.) + (1.-abs(s.z/(3.0*PI)))*vec3(0.,1.,115./255.);
+    
   }
 
   outColor = vec4(col, 1.0);
 }`;
 
-// ── GL helpers ────────────────────────────────────────────────────────────────
+// GL helpers
 
 function makeShader(type, src) {
   const s = gl.createShader(type);
@@ -271,13 +157,18 @@ function makeFBO(tex) {
   return fbo;
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
+// Init
 
 if (!gl.getExtension('EXT_color_buffer_float'))
   alert('EXT_color_buffer_float not supported — try Chrome/Firefox on desktop');
 
 const simProg  = makeProgram(VERT_SRC, SIM_SRC);
 const dispProg = makeProgram(VERT_SRC, DISP_SRC);
+
+let zoomTh1Min = -Math.PI;
+let zoomTh1Max = Math.PI;
+let zoomTh2Min = -Math.PI;
+let zoomTh2Max = Math.PI;
 
 const quadBuf = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
@@ -296,9 +187,21 @@ function buildInitialState() {
   for (let y = 0; y < SIZE; y++) {
     for (let x = 0; x < SIZE; x++) {
       const i = (y * SIZE + x) * 4;
-      data[i+0] = (x / (SIZE-1)) * 2 * Math.PI - Math.PI;
+      // data[i+0] = (x / (SIZE-1)) * 2 * Math.PI - Math.PI;
+      // data[i+0] = (x / (SIZE-1)) * Math.PI/2;
+      // data[i+0] = (x / (SIZE-1)) * Math.PI/4;
+      // data[i+0] = (x / (SIZE-1)) * Math.PI/2 + Math.PI/2;
+      // data[i+0] = (x / (SIZE-1)) * Math.PI/4 + Math.PI/2;
+      // data[i+0] = (x / (SIZE-1)) * Math.PI/8 + Math.PI/2;
+      data[i+0] = zoomTh1Min + (x / (SIZE-1)) * (zoomTh1Max - zoomTh1Min);
       data[i+1] = 0;
-      data[i+2] = (y / (SIZE-1)) * 2 * Math.PI - Math.PI;
+      // data[i+2] = (y / (SIZE-1)) * 2 * Math.PI - Math.PI;
+      // data[i+2] = (y / (SIZE-1)) * Math.PI/2 + Math.PI/2;
+      // data[i+2] = (y / (SIZE-1)) * Math.PI/4 + 3*Math.PI/4;
+      // data[i+2] = (y / (SIZE-1)) * Math.PI/2;
+      // data[i+2] = (y / (SIZE-1)) * Math.PI/4;
+      // data[i+2] = (y / (SIZE-1)) * Math.PI/8;
+      data[i+2] = zoomTh2Min + (y / (SIZE-1)) * (zoomTh2Max - zoomTh2Min);
       data[i+3] = 0;
     }
   }
@@ -323,7 +226,169 @@ function initBuffers() {
 
 initBuffers();
 
-// ── Render passes ─────────────────────────────────────────────────────────────
+// Zoom
+
+let zoomMode = false;
+let justZoomed = false;
+let dragStart = null;
+const zoomRectEl = document.getElementById('zoomRect');
+const zoomBtn = document.getElementById('zoomBtn');
+const resetZoomBtn = document.getElementById('resetZoomBtn');
+
+zoomBtn.addEventListener('click', () => {
+  zoomMode = !zoomMode;
+  zoomBtn.style.borderColor = zoomMode ? '#2196F3' : '';
+  zoomBtn.style.color = zoomMode ? '#2196F3' : '';
+  canvas.style.cursor = zoomMode ? 'crosshair' : 'default';
+});
+
+resetZoomBtn.addEventListener('click', () => {
+  zoomTh1Min = -Math.PI;
+  zoomTh1Max = Math.PI;
+  zoomTh2Min = -Math.PI;
+  zoomTh2Max = Math.PI;
+  resetZoomBtn.style.display = 'none';
+  initBuffers();
+  simTime = 0;
+});
+
+function canvasUV(e) {
+  const rect = canvas.getBoundingClientRect();
+  const rawPx = e.clientX - rect.left;
+  const rawPy = e.clientY - rect.top;
+  const px = Math.max(0, Math.min(rect.width,  rawPx));
+  const py = Math.max(0, Math.min(rect.height, rawPy));
+  return {
+    u: px / rect.width,
+    v: py / rect.height,
+    px,
+    py,
+  };
+}
+
+canvas.addEventListener('mousedown', (e) => {
+  if (!zoomMode) return;
+  e.preventDefault();
+  const { u, v, px, py } = canvasUV(e);
+  dragStart = { u, v, px, py };
+  zoomRectEl.style.display = 'block';
+  zoomRectEl.style.left   = px + 'px';
+  zoomRectEl.style.top    = py + 'px';
+  zoomRectEl.style.width  = '0px';
+  zoomRectEl.style.height = '0px';
+});
+
+// Move mousemove and mouseup to document so they fire outside the canvas
+document.addEventListener('mousemove', (e) => {
+  if (!zoomMode || !dragStart) return;
+  e.preventDefault();
+  const { px, py } = canvasUV(e);          // already clamped to [0,1]→canvas px
+  const x0 = Math.min(dragStart.px, px);
+  const y0 = Math.min(dragStart.py, py);
+  zoomRectEl.style.left   = x0 + 'px';
+  zoomRectEl.style.top    = y0 + 'px';
+  zoomRectEl.style.width  = Math.abs(px - dragStart.px) + 'px';
+  zoomRectEl.style.height = Math.abs(py - dragStart.py) + 'px';
+});
+
+document.addEventListener('mouseup', (e) => {
+  if (!dragStart) return;                   // nothing to do if no drag in progress
+  if (!zoomMode) { dragStart = null; return; }
+  e.preventDefault();
+  const { u: u1, v: v1 } = canvasUV(e);    // clamped UVs
+  const u0 = dragStart.u, v0 = dragStart.v;
+  zoomRectEl.style.display = 'none';
+  dragStart = null;
+
+  const du = Math.abs(u1 - u0), dv = Math.abs(v1 - v0);
+  if (du < 0.01 || dv < 0.01) return;
+
+  const th1Range = zoomTh1Max - zoomTh1Min;
+  const th2Range = zoomTh2Max - zoomTh2Min;
+  const newTh1Min = zoomTh1Min + Math.min(u0, u1) * th1Range;
+  const newTh1Max = zoomTh1Min + Math.max(u0, u1) * th1Range;
+  const newTh2Max = zoomTh2Max - Math.min(v0, v1) * th2Range;
+  const newTh2Min = zoomTh2Max - Math.max(v0, v1) * th2Range;
+
+  zoomTh1Min = newTh1Min; zoomTh1Max = newTh1Max;
+  zoomTh2Min = newTh2Min; zoomTh2Max = newTh2Max;
+
+  resetZoomBtn.style.display = '';
+  initBuffers();
+  simTime = 0;
+
+  zoomMode = false;
+  zoomBtn.style.borderColor = '';
+  zoomBtn.style.color = '';
+  canvas.style.cursor = 'default';
+  
+  justZoomed = true;
+  setTimeout(() => { justZoomed = false; }, 0);
+});
+
+// Zoom on touch screen
+
+function touchUV(e) {
+  const touch = e.touches[0] ?? e.changedTouches[0];
+  return canvasUV({ clientX: touch.clientX, clientY: touch.clientY });
+}
+
+canvas.addEventListener('touchstart', (e) => {
+  if (!zoomMode) return;
+  e.preventDefault();
+  const { u, v, px, py } = touchUV(e);
+  dragStart = { u, v, px, py };
+  zoomRectEl.style.display = 'block';
+  zoomRectEl.style.left   = px + 'px';
+  zoomRectEl.style.top    = py + 'px';
+  zoomRectEl.style.width  = '0px';
+  zoomRectEl.style.height = '0px';
+}, { passive: false });
+
+canvas.addEventListener('touchmove', (e) => {
+  if (!zoomMode || !dragStart) return;
+  e.preventDefault();
+  const { px, py } = touchUV(e);
+  const x0 = Math.min(dragStart.px, px);
+  const y0 = Math.min(dragStart.py, py);
+  zoomRectEl.style.left   = x0 + 'px';
+  zoomRectEl.style.top    = y0 + 'px';
+  zoomRectEl.style.width  = Math.abs(px - dragStart.px) + 'px';
+  zoomRectEl.style.height = Math.abs(py - dragStart.py) + 'px';
+}, { passive: false });
+
+canvas.addEventListener('touchend', (e) => {
+  if (!zoomMode || !dragStart) return;
+  e.preventDefault();
+  const { u: u1, v: v1 } = touchUV(e);
+  const u0 = dragStart.u, v0 = dragStart.v;
+  zoomRectEl.style.display = 'none';
+  dragStart = null;
+
+  const du = Math.abs(u1 - u0), dv = Math.abs(v1 - v0);
+  if (du < 0.01 || dv < 0.01) return;
+
+  const th1Range = zoomTh1Max - zoomTh1Min;
+  const th2Range = zoomTh2Max - zoomTh2Min;
+  const newTh1Min = zoomTh1Min + Math.min(u0, u1) * th1Range;
+  const newTh1Max = zoomTh1Min + Math.max(u0, u1) * th1Range;
+  const newTh2Max = zoomTh2Max - Math.min(v0, v1) * th2Range;
+  const newTh2Min = zoomTh2Max - Math.max(v0, v1) * th2Range;
+
+  zoomTh1Min = newTh1Min; zoomTh1Max = newTh1Max;
+  zoomTh2Min = newTh2Min; zoomTh2Max = newTh2Max;
+
+  resetZoomBtn.style.display = '';
+  initBuffers();
+  simTime = 0;
+
+  zoomMode = false;
+  zoomBtn.style.borderColor = '';
+  zoomBtn.style.color = '';
+  canvas.style.cursor = 'default';
+}, { passive: false });
+
+// Render
 
 let simTime = 0;
 const DT = 0.005;
@@ -357,10 +422,11 @@ function display() {
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 }
 
-// ── Loop ──────────────────────────────────────────────────────────────────────
+// Loop
 
 const timerEl = document.getElementById('timer');
-const speedEl = document.getElementById('speed');
+// const speedEl = document.getElementById('speed');
+const speedEl = 5;
 
 document.getElementById('resetBtn').addEventListener('click', () => {
   initBuffers();
@@ -368,19 +434,22 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 });
 
 function frame() {
-  const steps = parseInt(speedEl.value);
+  const steps = parseInt(speedEl);
   simStep(steps);
   simTime += steps * DT;
   display();
   timerEl.textContent = `t = ${simTime.toFixed(2)}`;
+// timerEl.innerHTML = `\\(t = ${simTime.toFixed(2)}\\)`;
+// MathJax.typesetPromise([timerEl]);
   requestAnimationFrame(frame);
 }
 
-requestAnimationFrame(frame);
+MathJax.startup.promise.then(() => {
+  requestAnimationFrame(frame);
+});
 
-// ═════════════════════════════════════════════════════════════════════════════
+
 // INSPECTOR: single-pendulum CPU simulation shown on click
-// ═════════════════════════════════════════════════════════════════════════════
 
 const inspector  = document.getElementById('inspector');
 const pendCanvas = document.getElementById('pendCanvas');
@@ -404,7 +473,7 @@ let inspectorState = null;
 
 function derivCPU([th1, w1, th2, w2]) {
   const dth = th2 - th1;
-  const M1 = 1, M2 = 1, M = 2, G = 9.81, L1 = 1, L2 = 1;
+  const M1 = 1, M2 = 1, M = M1+M2, G = 9.81, L1 = 1, L2 = 1;
   const cos_dth = Math.cos(dth);
   const sin_dth = Math.sin(dth);
   const alpha1 = L2/L1*M2/M * cos_dth;
@@ -452,7 +521,7 @@ function drawPendulum(state) {
   if (trail.length > 1) {
     for (let i = 1; i < trail.length; i++) {
       const t = i / trail.length;
-      ctx.strokeStyle = `rgba(232,136,119,${t * 0.8})`;
+      ctx.strokeStyle = `rgba(33,150,243,${t * 0.8})`;
       ctx.lineWidth = t * 1.2;
       ctx.beginPath();
       ctx.moveTo(trail[i-1][0], trail[i-1][1]);
@@ -469,7 +538,7 @@ function drawPendulum(state) {
   ctx.beginPath(); ctx.arc(cx, cy, 3, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle = '#aaa';
   ctx.beginPath(); ctx.arc(x1, y1, 4, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#e87';
+  ctx.fillStyle = 'rgb(33, 150, 243)';
   ctx.beginPath(); ctx.arc(x2, y2, 5, 0, Math.PI*2); ctx.fill();
 }
 
@@ -483,15 +552,22 @@ function openInspector(th1_0, th2_0, mouseX, mouseY) {
     `<b>\\(\\theta_{20} = ${th2_0.toFixed(8)} \\)<br>`;
 
   MathJax.typesetPromise([pendInfo]);
-  const panelW = 220, panelH = 300;
-  const l = 5;
-  let px = mouseX + l;
-  let py = mouseY - l;
-  if (px + panelW*1 > window.innerWidth)  px -= panelW;
-  if (py - panelH*1 < 0) py += panelH + 2*l;
-  inspector.style.left = px + 'px';
-  inspector.style.top  = py-panelH + 'px';
   inspector.classList.add('visible');
+  const panelW = inspector.offsetWidth;
+  const panelH = inspector.offsetHeight;
+
+  // mouseX/mouseY are pageX/pageY; convert to container-relative
+  const containerRect = container.getBoundingClientRect();
+  const cx = mouseX - (containerRect.left + window.scrollX);
+  const cy = mouseY - (containerRect.top  + window.scrollY);
+
+  let px = cx;
+  let py = cy - panelH;
+  if (px + panelW > containerRect.width) px = cx - panelW;
+  if (py < 0)                            py = cy;
+
+  inspector.style.left = px + 'px';
+  inspector.style.top  = py + 'px';
 
   const DT_INSP = 0.01;
   const STEPS_PER_FRAME = 3;
@@ -510,14 +586,15 @@ document.getElementById('closeBtn').addEventListener('click', () => {
 });
 
 canvas.addEventListener('click', (e) => {
+  if (zoomMode || justZoomed) return;
   const rect = canvas.getBoundingClientRect();
   const u = (e.clientX - rect.left) / rect.width;
   const v = (e.clientY - rect.top)  / rect.height;
-  const th1_0 =  u * 2 * Math.PI - Math.PI;
-  const th2_0 = -v * 2 * Math.PI + Math.PI;
-  console.log(e.clientX,(e.clientY - rect.top));
-  openInspector(th1_0, th2_0, (e.clientX), (e.clientY - rect.top));
+
+  const th1_0 = zoomTh1Min + u * (zoomTh1Max - zoomTh1Min);
+  const th2_0 = zoomTh2Max - v * (zoomTh2Max - zoomTh2Min);
+
+  openInspector(th1_0, th2_0, e.pageX, e.pageY);
 });
-</script>
-</body>
-</html>
+
+

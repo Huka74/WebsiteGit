@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 1</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.9.0/lib/browser/math.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.css">
+    <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js">
+    </script>
+
+
+    <base href="/WebsiteGit/">
+    <!-- <base href="/"> -->
+    <script src="navbar.js"></script>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+
+
+<!-- \(\definecolor{green}{RGB}{105,156,82}\)
+\(\definecolor{blue}{RGB}{35,107,142}\)
+\(\definecolor{red}{RGB}{207,80,68}\)
+\(\definecolor{yellow}{RGB}{232,193,28}\)
+\(\definecolor{orange}{RGB}{199,141,70}\) -->
+
+
+<div class="main-content">
+
+    
+
+    <h1>Double Pendulum</h1>
+
+    <br><br><br><br><br>
+
+    <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* body {
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Courier New', monospace;
+    color: #aaa;
+  } */
+  /* canvas { display: block; image-rendering: pixelated; } */
+  canvas { touch-action: none; }
+  #ui {
+    margin-top: 14px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    /* font-size: 12px;
+    letter-spacing: 0.08em; */
+  }
+  label { display: flex; align-items: center; gap: 8px; }
+  input[type=range] { width: 120px; accent-color: #2196F3; }
+  button {
+    background: none;
+    border: 1px solid #555;
+    color: #aaa;
+    padding: 4px 12px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+  }
+  button:hover { border-color: #2196F3; color: #2196F3; }
+  #info { font-size: 11px; color: #555; margin-top: 8px; }
+  /* Pendulum inspector overlay */
+  #inspector {
+    display: none;
+    position: absolute;
+    background: #0d0d0d;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 10px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.8);
+    z-index: 100;
+    min-width: 220px;
+  }
+  #inspector.visible { display: block; }
+  #inspector header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    /* font-size: 11px;
+    letter-spacing: 0.1em; */
+    color: #666;
+  }
+  #inspector header span { color: #2196F3; }
+  #closeBtn {
+    cursor: pointer;
+    color: #555;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0 2px;
+  }
+  #closeBtn:hover { color: #2196F3; }
+  #pendCanvas {
+    display: block;
+    background: #050505;
+    border: 1px solid #1a1a1a;
+    border-radius: 2px;
+  }
+  #pendInfo {
+    margin-top: 8px;
+    font-size: 10px;
+    color: #555;
+    line-height: 1.7;
+  }
+  #pendInfo b { color: #888; }
+  #zoomRect {
+  position: absolute;
+  border: 1px solid #2196F3;
+  background: rgba(33,150,243,0.12);
+  pointer-events: none;
+  display: none;
+}
+#container { position: relative; }
+</style>
+</head>
+<body>
+
+<div id="container" style="width: 100%; max-width: 600px; margin-left: auto; margin-right: auto;">
+<canvas id="c"></canvas>
+<div id="ui">
+  <!-- <label>SPEED <input type="range" id="speed" min="1" max="20" value="5"></label> -->
+  <!-- <label>Scene -->
+    <select id="colormode" style="background:#111;border:1px solid #444;color:#aaa;font-family:inherit;font-size:12px;padding:2px 6px;">
+      <option value="4">flip count</option>
+      <option value="0">theta2 angle</option>
+      <option value="1">energy</option>
+      <option value="2">omega2 velocity</option>
+      <option value="3">quadrant</option>
+    </select>
+  </label>
+  <button id="resetBtn">RESET</button>
+  <button id="zoomBtn">ZOOM</button>
+  <button id="resetZoomBtn" style="display:none">RESET ZOOM</button>
+  <div id="zoomRect"></div>
+  <span id="timer">\(t = 0.00\)</span>
+</div>
+<div id="inspector">
+  <header>
+    <span>Pendulum</span>
+    <div id="closeBtn">&#x2715;</div>
+  </header>
+  <canvas id="pendCanvas" width="180" height="180"></canvas>
+  <div id="pendInfo"></div>
+</div>
+</div>
+
+    <a id="p5-container-doublependulum-link"></a>
+    <div id="p5-container-doublependulum"
+    data-show="1"
+    style="position: relative; height:350px; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto;">
+    </div>
+
+    Here we consider a double pendulum consisting of a
+    mass \(m_1\) attached to an anchor point with a massless solid rod of length \(l_1\)
+    and a mass \(m_2\) attached to the first one with a massless solid rod of length \(l_2\).
+    Both are subject to gravity \(g\). <br>
+    Since both masses are constraint to move on a circle, it is natural to use
+    angles \(\theta_1,\theta_2\) instead of \(x_1,y_1,x_2,y_2\) to describe their motion.
+    The angles are defined as:
+
+    <div id="p5-container-doublependulum-sketch"
+    style="position: relative; height:200px; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto;">
+    </div>
+
+    This parametrisation is not unique, as the zero of the angles can be chosen arbitrarily.
+    For instance, using \(x=(\sin\theta,-\cos\theta)\) places \(\theta=0\) at the bottom
+    of the circle, but other choices are equally valid and correspond to a rotation of the parametrisation. <br>
+    Using this convention, we can write the position and velocity of the masses:
+
+    \begin{equation}
+    \begin{array}{l}
+
+    \mathbf{x}_1 = l_1\left(\begin{array}{l}
+    \sin\theta_1\\
+    -\cos\theta_1
+    \end{array}\right) \qquad
+    &
+    \mathbf{x}_2 = \mathbf{x}_1 + l_2\left(\begin{array}{l}
+    \sin\theta_2\\
+    -\cos\theta_2
+    \end{array}\right)\\
+
+    \mathbf{v}_1 = l_1\dot{\theta}_1\left(\begin{array}{l}
+    \cos\theta_1\\
+    \sin\theta_1
+    \end{array}\right) \qquad
+    &
+    \mathbf{v}_2 = \mathbf{v}_1 + l_2\dot{\theta}_2\left(\begin{array}{l}
+    \cos\theta_2\\
+    \sin\theta_2
+    \end{array}\right)\\
+
+    \mathbf{v}_1^2 = l_1^2\dot{\theta}_1^2 \qquad
+    &
+    \mathbf{v}_2^2 = l_1^2\dot{\theta}_1^2 + l_2^2\dot{\theta}_2^2 + 2l_1l_2\dot{\theta}_1\dot{\theta}_2\cos(\theta_2-\theta_1)
+    
+    \end{array}
+    \end{equation}
+
+    With this, the kinetic and potential energies can be computed:
+
+    \begin{equation} 
+    \begin{split}
+    T & = \frac{1}{2}m_1\mathbf{v}_1^2 + \frac{1}{2}m_2\mathbf{v}_2^2\\
+    & = \frac{1}{2}m_1l_1^2\dot{\theta}_1^2 + \frac{1}{2}m_2\left(l_1^2\dot{\theta}_1^2+l_2^2\dot{\theta}_2^2+2l_1l_2\dot{\theta}_1\dot{\theta}_2\cos(\theta_2-\theta_1)\right)\\
+    & = \frac{1}{2}(m_1+m_2)l_1^2\dot{\theta}_1^2 + \frac{1}{2}m_2l_2^2\dot{\theta}_2^2 + m_2l_1l_2\dot{\theta}_1\dot{\theta}_2\cos(\theta_2-\theta_1)\\
+    & \\
+    V & = m_1gy_1 + m_2gy_2\\
+    & = -gm_1l_1\cos\theta_1 - gm_2(l_1\cos\theta_1+l_2\cos\theta_2)\\
+    & = -g(m_1+m_2)l_1\cos\theta_1 - gm_2l_2\cos\theta_2
+    \end{split}
+    \end{equation}
+
+    as well as their derivatives:
+
+    \begin{equation}
+    \begin{split}
+    \frac{\partial V}{\partial \theta_1} & = g(m_1+m_2)l_1\sin\theta_1 & \qquad \frac{\partial V}{\partial \dot{\theta_1}}=0\\
+    \frac{\partial V}{\partial \theta_2} & = gm_2l_2\sin\theta_2       & \qquad \frac{\partial V}{\partial \dot{\theta_2}}=0\\
+    \end{split}
+    \end{equation}
+
+    \begin{equation}
+    \begin{split}
+    \frac{\partial T}{\partial \theta_1} & = m_2l_1l_2\dot{\theta}_1\dot{\theta}_2\sin(\theta_2-\theta_1) & \qquad \frac{\partial T}{\partial \dot{\theta_1}} & = (m_1+m_2)l_1^2\dot{\theta}_1 + m_2l_1l_2\dot{\theta}_2\cos(\theta_2-\theta_1)\\
+    \frac{\partial T}{\partial \theta_2} & = -m_2l_1l_2\dot{\theta}_1\dot{\theta}_2\sin(\theta_2-\theta_1) & \qquad \frac{\partial T}{\partial \dot{\theta_2}} & = m_2l_2^2\dot{\theta}_2 + m_2l_1l_2\dot{\theta}_1\cos(\theta_2-\theta_1)\\
+    \end{split}
+    \end{equation}
+
+    Putting these together to form the Lagrangian \(\mathcal{L}=T-V\), we can compute
+    the relevant quantities for the Euler-Lagrange equations \(\frac{\mathrm{d}\:}{\mathrm{d}t}\frac{\partial \mathcal{L}}{\partial\dot{\theta_i}} - \frac{\partial \mathcal{L}}{\partial \theta_i} = 0\).
+
+    \begin{equation}
+    \begin{split}
+    \frac{\mathrm{d}\:}{\mathrm{d}t}\frac{\partial \mathcal{L}}{\partial\dot{\theta_1}} & = (m_1+m_2)l_1^2\ddot{\theta}_1 + m_2l_1l_2\ddot{\theta}_2\cos(\theta_2-\theta_1) - m_2l_1l_2\dot{\theta}_2(\dot{\theta}_2-\dot{\theta}_1)\sin(\theta_2-\theta_1) \\
+    \frac{\mathrm{d}\:}{\mathrm{d}t}\frac{\partial \mathcal{L}}{\partial\dot{\theta_2}} & = m_2l_1l_2\ddot{\theta}_1\cos(\theta_2-\theta_1) + m_2l_2^2\ddot{\theta}_2   - m_2l_1l_2\dot{\theta}_1(\dot{\theta}_2-\dot{\theta}_1)\sin(\theta_2-\theta_1) \\
+    \frac{\partial \mathcal{L}}{\partial \theta_1} & = m_2l_1l_2\dot{\theta}_1\dot{\theta}_2\sin(\theta_2-\theta_1) - g(m_1+m_2)l_1\sin\theta_1\\
+    \frac{\partial \mathcal{L}}{\partial \theta_2} & = -m_2l_1l_2\dot{\theta}_1\dot{\theta}_2\sin(\theta_2-\theta_1) - gm_2l_2\sin\theta_2\\
+    \end{split}
+    \end{equation}
+
+    <!-- \begin{equation} 
+    \left\{\begin{array}{ll}
+    \frac{\mathrm{d}\:}{\mathrm{d}t}\frac{\partial \mathcal{L}}{\partial\dot{\theta_1}} - \frac{\partial \mathcal{L}}{\partial \theta_1} = 0\\
+    \frac{\mathrm{d}\:}{\mathrm{d}t}\frac{\partial \mathcal{L}}{\partial\dot{\theta_2}} - \frac{\partial \mathcal{L}}{\partial \theta_2} = 0\\
+    \end{array}\right.
+    \end{equation} -->
+    The Euler-Lagrange equations for \(\theta_1\) and \(\theta_2\) gives the following system
+    
+    \begin{equation}
+    \begin{split}
+    &
+    \left\{\begin{array}{ll}
+    (m_1+m_2)l_1^2\ddot{\theta}_1 + m_2l_1l_2\ddot{\theta}_2\cos(\theta_2-\theta_1) = m_2l_1l_2\dot{\theta}_2^2\sin(\theta_2-\theta_1) - g(m_1+m_2)l_1\sin\theta_1\\
+    m_2l_1l_2\ddot{\theta}_1\cos(\theta_2-\theta_1) + m_2l_2^2\ddot{\theta}_2  = -m_2l_1l_2\dot{\theta}_1^2\sin(\theta_2-\theta_1) - gm_2l_2\sin\theta_2\\
+    \end{array}\right.
+    <!-- \end{equation}
+  
+    \begin{equation} -->
+    \\
+    \\ &
+    \left\{\begin{array}{lll}
+    \ddot{\theta}_1 + \frac{m_2}{m_1+m_2}\frac{l_2}{l_1}\cos(\theta_2-\theta_1)\ddot{\theta}_2 &  = \frac{m_2}{m_1+m_2}\frac{l_2}{l_1}\sin(\theta_2-\theta_1)\dot{\theta}_2^2 & - \frac{g}{l_1}\sin\theta_1\\
+    \frac{l_1}{l_2}\cos(\theta_2-\theta_1)\ddot{\theta}_1 + \ddot{\theta}_2  & = -\frac{l_1}{l_2}\sin(\theta_2-\theta_1)\dot{\theta}_1^2 & - \frac{g}{l_2}\sin\theta_2\\
+    \end{array}\right.
+    \end{split}
+    \end{equation}
+
+    which can be written in matrix form
+
+    \begin{equation}
+    \left(\begin{array}{cc}
+    1 & \frac{m_2}{m_1+m_2}\frac{l_2}{l_1}\cos(\theta_2-\theta_1) \\
+    \frac{l_1}{l_2}\cos(\theta_2-\theta_1) & 1
+    \end{array}\right)
+    \left(\begin{array}{c}
+    \ddot{\theta}_1 \\
+    \ddot{\theta}_2
+    \end{array}\right) = 
+    \left(\begin{array}{c}
+    \frac{m_2}{m_1+m_2}\frac{l_2}{l_1}\sin(\theta_2-\theta_1)\dot{\theta}_2^2 & - \frac{g}{l_1}\sin\theta_1 \\
+    -\frac{l_1}{l_2}\sin(\theta_2-\theta_1)\dot{\theta}_1^2 & - \frac{g}{l_2}\sin\theta_2
+    \end{array}\right)
+    \end{equation}
+
+    Defining \(m=\frac{m_2}{m_1+m_2}\) and \(l=\frac{l_1}{l_2}\), and solving the system gives the equation of motion
+    for \(\theta_1\) and \(\theta_2\).
+
+    \begin{equation}
+    \left\{\begin{array}{c}
+    \ddot{\theta}_1 = \frac{1}{1-m\cos^2(\theta_2-\theta_1)}\left(\frac{m}{l}\sin(\theta_2-\theta_1)\left(\dot{\theta}_2^2+l\cos(\theta_2-\theta_1)\dot{\theta}_1^2\right) + \frac{g}{l_1}\left(m\cos(\theta_2-\theta_1)\sin\theta_2 - \sin\theta_1\right) \right)\\
+    \ddot{\theta}_2 = \frac{1}{1-m\cos^2(\theta_2-\theta_1)}\left(-ml\sin(\theta_2-\theta_1)\left(\dot{\theta}_1^2+l\cos(\theta_2-\theta_1)\dot{\theta}_2^2\right)         + \frac{g}{l_2}\left(\cos(\theta_2-\theta_1)\sin\theta_1 - \sin\theta_2\right) \right)\\
+    \end{array}\right.
+    \end{equation}
+
+    While these equations cannot be solved analytically, they can be integrated numerically, 
+    like in the <a href="#p5-container-doublependulum-link" class="custom-link" onclick="
+    const t = document.getElementById('p5-container-doublependulum'),
+    r = t.getBoundingClientRect();
+    window.scrollTo({top:r.bottom+window.scrollY-r.height/2-window.innerHeight/2,behavior:'smooth'});
+    return false;">animation</a>
+
+
+    Looking at small angles, we linearize the equations and obtain
+
+    \begin{equation}
+    \left(\begin{array}{c}
+    \ddot{\theta}_1 \\
+    \ddot{\theta}_2
+    \end{array}\right) = 
+    \frac{g}{1-m}\left(\begin{array}{cc}
+    -\frac{1}{l_1} & \frac{m}{l_1} \\
+    \frac{1}{l_2} & -\frac{1}{l_2}
+    \end{array}\right)
+    \left(\begin{array}{c}
+    \theta_1 \\
+    \theta_2
+    \end{array}\right)
+    \end{equation}
+
+    Imposing harmonic solutions : \(\ddot{\mathbf{\theta}}=\lambda \mathbf{\theta}\)
+    We can find the normal modes of the double pendulum by solving the eigenvalue problem
+
+    \begin{equation}
+    \frac{g}{1-m}\left(\begin{array}{cc}
+    -\frac{1}{l_1} & \frac{m}{l_1} \\
+    \frac{1}{l_2} & -\frac{1}{l_2}
+    \end{array}\right)
+    \mathbf{\theta} = A\mathbf{\theta} = \lambda\mathbf{\theta}
+    \end{equation}
+
+    This gives
+    <div class="collapsible-trigger" onclick="toggleDetails(this)">
+      <span class="arrow">▶</span>
+      <span>Show detailed steps</span>
+    </div>
+    <div class="details-box">
+        \begin{equation}
+        \begin{split}
+        \text{det}\left(A-\lambda\mathbb{1}\right) & = 
+        \left|\begin{array}{cc}
+        -\frac{g}{1-m}\frac{1}{l_1}-\lambda & \frac{g}{1-m}\frac{m}{l_1} \\
+        \frac{g}{1-m}\frac{1}{l_2} & -\frac{g}{1-m}\frac{1}{l_2}-\lambda
+        \end{array}\right| \\
+        & = \left(\lambda+\frac{g}{1-m}\frac{1}{l_1}\right)\left(\lambda+\frac{g}{1-m}\frac{1}{l_2}\right) - \frac{g^2}{(1-m)^2}\frac{m}{l_1l_2}\\
+        & = \lambda^2+\frac{g}{1-m}\left(\frac{1}{l_1}+\frac{1}{l_2}\right)\lambda+\frac{g^2}{1-m}\frac{1}{l_1l_2} = 0
+        \end{split}
+        \end{equation}
+        
+        \begin{equation}
+        \lambda = -\frac{g}{2}\left(1+\frac{m_2}{m_1}\right)\left(\frac{1}{l_1}+\frac{1}{l_2}\right)
+        \left( 1 \pm \sqrt{1-4\frac{l_1l_2}{(l_1+l_2)^2}\frac{m_1}{m_1+m_2}}\right)
+        \end{equation}
+
+        Notice that \((l_1+l_2)^2-4l_1l_2=(l_1-l_2)^2\ge0\Longrightarrow \frac{4l_1l_2}{(l_1+l_2)^2}\le1\)
+        so the square root is always defined, and the eigenvalue \(\lambda\) are always negative as expected
+        for a oscillating solution.
+    </div>
+
+    \begin{equation}
+    \lambda = -\frac{g}{2}\left(1+\frac{m_2}{m_1}\right)\left(\frac{1}{l_1}+\frac{1}{l_2}\right)
+    \left( 1 \pm \sqrt{1-4\frac{l_1l_2}{(l_1+l_2)^2}\frac{m_1}{m_1+m_2}}\right)
+    \end{equation}
+
+    For \(l_1=l_2=l, m_1=m_2\), the eigenfrequencies are 
+    \begin{equation}
+    \omega_\pm = \sqrt{\frac{g}{l}\left(2\pm\sqrt{2}\right)}
+    \end{equation}
+
+    
+
+</div>
+
+
+
+<script>
+    function toggleDetails(trigger) {
+        const arrow = trigger.querySelector('.arrow');
+        const detailsBox = trigger.nextElementSibling;
+        const textSpan = trigger.querySelector('span:last-child');
+        
+        arrow.classList.toggle('expanded');
+        detailsBox.classList.toggle('expanded');
+        
+        if (detailsBox.classList.contains('expanded')) {
+            textSpan.textContent = 'Hide detailed steps';
+        } else {
+            textSpan.textContent = 'Show detailed steps';
+        }
+    }
+</script>
+
+
+
+</div>
+</body>
+
+<script src="Coupled/doublependulum.js"></script>
+<script src="Coupled/doublependulum-sketch.js"></script>
+<script src="utils.js"></script>
+<script src="UIObjects.js"></script>
+<script src="Coupled/PhaseSpace.js"></script>
+
+</html>

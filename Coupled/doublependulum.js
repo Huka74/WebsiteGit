@@ -1,4 +1,4 @@
-let SketchPendulum = (containerId) => (p) => {
+let SketchDoublePendulum = (containerId) => (p) => {
 let w = 600;
 let h = 600;
 
@@ -19,7 +19,7 @@ let v1 = [g+w1*l_vec[1],-w1*l_vec[0]];
 let w2 = -1/2*g*(1/l_vec[0]+1/l_vec[1])*(1+m_vec[1]/m_vec[0])*(1 + math.sqrt(1-4*m_vec[0]/(m_vec[0]+m_vec[1])*l_vec[0]*l_vec[1]/(l_vec[0]+l_vec[1])**2));
 let v2 = [g+w2*l_vec[1],-w2*l_vec[0]];
 let eps1 = 0.5;
-let eps2 = 0.05;
+let eps2 = 0.09;
 let lambda = 0;
 
 let button1;
@@ -27,6 +27,9 @@ let button2;
 let w_button = 40;
 let h_button = 20;
 let r_button = 3;
+
+let M1;
+let M2;
 
 let draggingM1 = false;
 let draggingM2 = false;
@@ -36,7 +39,7 @@ let draggedObject = null;
 
 let bgColor;
 let textColor;
-let show;
+let show_button;
 
 let translation = [w/2-40,h/2-200];
 let scaling = [1,-1];
@@ -48,7 +51,7 @@ p.setup = function() {
   let canvas = p.createCanvas(container.clientWidth, container.clientHeight);
   canvas.parent(containerId);
 
-  show = container.dataset.show !== undefined ? parseFloat(container.dataset.show) : 1;
+  show_button = container.dataset.show !== undefined ? parseFloat(container.dataset.show) : 1;
 
   w = container.clientWidth
   h = container.clientHeight
@@ -185,9 +188,13 @@ p.setup = function() {
   
 
   // UIObjects array
-  UIObjects = [button1, button2, M1, M2];
+  if(show_button){
+    UIObjects = [button1, button2, M1, M2];
+  } else {
+    UIObjects = [M1, M2];
+  }
 
-//   console.log(M1.position, M2.position)
+  // console.log(w1,w2,g/l_vec[0]*(2-p.sqrt(2)),g/l_vec[0]*(2+p.sqrt(2)))
 }
 
 
@@ -232,14 +239,7 @@ p.draw = function() {
   p.scale(scaling[0],scaling[1]);
 
 
-  button1.color = p.color(bgColor);
-  button2.color = p.color(bgColor);
 
-  button1.show();
-  button2.show();
-
-  button1.hover = false;
-  button2.hover = false;
 
   if(!draggingM2){
     p.update(draggingM1 ? p.F_solo : p.F);
@@ -260,10 +260,27 @@ p.draw = function() {
  
   M1.position = X[0];
   M2.position = X[1];
+
+  if(!show_button){
+    p.arc(X0[0],X0[1],5*R,5*R,-p.PI/2,p.PI/2-theta[0]);
+    p.arc(M1.position[0], M1.position[1],5*R,5*R,-p.PI/2,p.PI/2-theta[1]);
+  }
+
   M1.show();
   M2.show();
   M1.color = p.color(bgColor);
   M2.color = p.color(bgColor);
+
+  if(show_button){
+  button1.color = p.color(bgColor);
+  button2.color = p.color(bgColor);
+
+  button1.show();
+  button2.show();
+
+  button1.hover = false;
+  button2.hover = false;
+  }
 
 
   for(let obj of UIObjects){
@@ -433,7 +450,7 @@ p.mouseDragged = function() {
         return;
     }
 
-    return false;
+    // return false;
 }
 
 p.mouseReleased = function() {
@@ -458,4 +475,5 @@ p.transformMouse = function([mouseX, mouseY], translation, scaling){
 
 }
 
-new p5(SketchPendulum("p5-container-doublependulum"))
+new p5(SketchDoublePendulum("p5-container-doublependulum"))
+// new p5(SketchPendulum("p5-container-doublependulum-sketch"))
