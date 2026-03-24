@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Part 1</title>
+    <title>Double Pendulum</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mathjs@11.9.0/lib/browser/math.js"></script>
 
@@ -36,9 +36,10 @@
 
     
 
-    <h1>Double Pendulum</h1>
+    <h1>Double Pendulum: Stable and periodic solutions</h1>
 
-    <br><br><br><br><br>
+
+    <br>
 
     <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -138,12 +139,12 @@
   <!-- <label>SPEED <input type="range" id="speed" min="1" max="20" value="5"></label> -->
   <!-- <label>Scene -->
     <select id="colormode" style="background:#111;border:1px solid #444;color:#aaa;font-family:inherit;font-size:12px;padding:2px 6px;">
-      <option value="4">flip count</option>
-      <option value="0">theta2 angle</option>
-      <option value="1">energy</option>
-      <option value="2">omega2 velocity</option>
-      <option value="3">quadrant</option>
+      <option value="4">\(\theta_{2}\)</option>
+      <!-- <option value="0">theta2 angle</option> -->
+      <!-- <option value="2">omega2 velocity</option> -->
       <option value="5">Lyapunov exponent</option>
+      <option value="3">Quadrant</option>
+      <option value="1">Energy</option>
     </select>
   </label>
   <button id="resetBtn">RESET</button>
@@ -163,10 +164,37 @@
 </div>
 
 
-    where
-    <div id="p5-container-doublependulum-periodic">
+    Check out <a href="Coupled/doublependulum.html">this</a> for the full derivation of the equation of motion
+    of the double pendulum and the small angle analysis. <br>
+    Each pixel of this canvas represent a double pendulum, with different initial angles.
+    \(\theta_1\), in the \(x\) axis, and \(\theta_2\), in the \(y\) axis, go form \(-\pi\) to \(\pi\).
+    Both initial angular velocities \(\dot{\theta}_1\) and \(\dot{\theta}_2\) are set to be \(0\). <br>
+    The "zoom" button can be used to click and drag to zoom on the canvas,
+    the "reset" button reset the simulation time to \(0\)
+    and the drop down menu can be used to change what is shown for each pendulum <br><br>
+    <div style="position: relative; margin-left: 50px;">
+    1. Shows the value of \(\theta_2\), from cyan for large negative values, to dark blue near 0
+    and then to pink for large positive value. This can be used to find stability islands,
+    where the \(\theta_2\) stays near 0. However, this does not mean that blue points 
+    necessarly are periodic, nor that non blue points are not periodic.
+    A better metric is the second option.<br><br>
+    2. Shows an estimation of the Lyapunov exponent. It shows how quickly two pendulums starting with
+    similar initial conditions diverge from one another. Green shows small Lyapunov exponent, stable initial
+    condition, and blue shows large Lyapunov exponent, chaotic initial conditions. <br><br>
+    3. Shows in which quadrant the second mass is: green when the second mass is on the top right
+    of the first one, blue on the bottom right, pink on the bottom left, and yellow on the top left. <br><br>
+    4. Shows the energy. Notice, as expected by energy conservation, that the color do not change. <br><br>
     </div>
-    to
+
+    We can clearly see a large stable zone on the center, corresponding to low energy pendulums. <br>
+    However, when searching around using the \(\theta_2\) and Lyapunov estimation, one can find some
+    isolated stability islands, with interesting trajectories. <br>
+    Here are some examples of initial condition that result in some periodic or quasi-periodic trajectories. <br><br>
+    <!-- <div id="p5-container-doublependulum-periodic">
+    </div> -->
+    <div id="p5-container-doublependulum-periodic"
+    style="position: relative; height:2300px; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto;">
+    </div>
     
 
 </div>
@@ -196,7 +224,7 @@
 </body>
 
 
-<script src="Coupled/DoublePendulumPeriodic.js"></script>
+<script src="Coupled/DoublePendulumPeriodicSingle.js"></script>
 <script src="utils.js"></script>
 <script src="UIObjects.js"></script>
 <script src="Coupled/PhaseSpace.js"></script>

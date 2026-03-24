@@ -1,8 +1,98 @@
 const container = document.getElementById('container');
-const SIZE = Math.min(container.clientWidth, 800);
+const SIZE = Math.min(container.clientWidth, 600);
+
 const canvas = document.getElementById('c');
 canvas.width = SIZE;
 canvas.height = SIZE;
+
+let zoomTh1Min = -Math.PI;
+let zoomTh1Max = Math.PI;
+let zoomTh2Min = -Math.PI;
+let zoomTh2Max = Math.PI;
+
+let zoomMode = false;
+let justZoomed = false;
+
+// const IS_MOBILE = window.innerWidth < 768;
+// if (IS_MOBILE) {
+ 
+//   const IMAGE_PATHS = {
+//     // 0: 'Coupled/pendulum_0.png',
+//     1: 'Coupled/Energy.png',
+//     // 2: 'Coupled/pendulum_2.png',
+//     3: 'Coupled/Quadrant.png',
+//     4: 'Coupled/Theta2.png',
+//     5: 'Coupled/Lyapunov.png',
+//   };
+ 
+//   // Replace <canvas> with <img>
+//   const img = document.createElement('img');
+//   img.id = 'mobileImg';
+//   img.style.cssText = 'width:100%;display:block;border:1px solid #1a1a1a;border-radius:2px;touch-action:none;';
+//   canvas.replaceWith(img);
+ 
+//   // Hide zoom controls
+//   zoomBtn.style.display = 'none';
+//   resetZoomBtn.style.display = 'none';
+ 
+//   function loadModeImage(mode) {
+//     img.src = IMAGE_PATHS[mode] ?? IMAGE_PATHS[0];
+//   }
+ 
+//   // Load initial mode
+//   loadModeImage(parseInt(document.getElementById('colormode').value));
+ 
+//   // Switch image on color mode change
+//   document.getElementById('colormode').addEventListener('change', (e) => {
+//     loadModeImage(parseInt(e.target.value));
+//   });
+ 
+//   // Reset button
+//   document.getElementById('resetBtn').addEventListener('click', () => {
+//     loadModeImage(parseInt(document.getElementById('colormode').value));
+//     timerEl.textContent = 't = 0.00';
+//   });
+ 
+//   // Helper: UV → angles (uses fixed zoom state, no zoom on mobile)
+//   function uvToAngles(u, v) {
+//     const th1 = zoomTh1Min + u * (zoomTh1Max - zoomTh1Min);
+//     const th2 = zoomTh2Max - v * (zoomTh2Max - zoomTh2Min);
+//     return { th1, th2 };
+//   }
+ 
+//   // Click → inspector
+//   img.addEventListener('click', (e) => {
+//     const rect = img.getBoundingClientRect();
+//     const u = (e.clientX - rect.left) / rect.width;
+//     const v = (e.clientY - rect.top)  / rect.height;
+//     const { th1, th2 } = uvToAngles(u, v);
+//     openInspector(th1, th2, e.pageX, e.pageY);
+//   });
+ 
+//   // Touch tap → inspector (ignore swipes)
+//   let touchStartPos = null;
+//   img.addEventListener('touchstart', (e) => {
+//     const t = e.touches[0];
+//     touchStartPos = { x: t.clientX, y: t.clientY };
+//   }, { passive: true });
+ 
+//   img.addEventListener('touchend', (e) => {
+//     const t = e.changedTouches[0];
+//     if (!touchStartPos) return;
+//     const dx = Math.abs(t.clientX - touchStartPos.x);
+//     const dy = Math.abs(t.clientY - touchStartPos.y);
+//     touchStartPos = null;
+//     if (dx > 10 || dy > 10) return; // swipe, not a tap
+ 
+//     const rect = img.getBoundingClientRect();
+//     const u = (t.clientX - rect.left) / rect.width;
+//     const v = (t.clientY - rect.top)  / rect.height;
+//     const { th1, th2 } = uvToAngles(u, v);
+//     openInspector(th1, th2, t.pageX, t.pageY);
+//   }, { passive: true });
+  
+// } else {
+
 const gl = canvas.getContext('webgl2');
 if (!gl) { alert('WebGL2 not supported'); }
 
@@ -83,8 +173,8 @@ void main() {
     // if (dist > 0.0) {
       float n = max(ly.y, 1.0);
       float safeDist = max(dist, 1e-10);
-      ly.x = log(safeDist / u_eps) / n;
-      // ly.x = log(dist / u_eps/ly.y);       // accumulate log-stretch
+      // ly.x = 100.*log(safeDist / u_eps) / n;
+      ly.x = log(dist / u_eps / ly.y);       // accumulate log-stretch
       // ly.x = dist;
       ly.y += 1.0;
       // sp = s + diff * (u_eps / dist);  // renormalize back to epsilon
@@ -138,7 +228,13 @@ void main() {
     col = hsv2rgb(vec3(q/4.0, 0.8, 1.0));
 
   } else if (u_colorMode == 4) {
-    col = abs(s.z/(3.0*PI))*vec3(0., 0., 117./255.) + (1.-abs(s.z/(3.0*PI)))*vec3(0.,1.,115./255.);
+    // col = abs(s.z/(3.0*PI))*vec3(0., 0., 117./255.) + (1.-abs(s.z/(3.0*PI)))*vec3(0.,1.,115./255.);
+    float t = smoothstep(-4.*PI,4.*PI,s.z);
+    if (t >= 0.5) {
+      col = mix(vec3(0., 0., 117./255.),vec3(1.,0.,1.),2.*(t-0.5));
+    } else {
+      col = mix(vec3(0.,212./255.,1.),vec3(0., 0., 117./255.),2.*t);
+    }
 
   } else {
     // Mode 5: Lyapunov exponent — blue = stable, red = chaotic
@@ -248,10 +344,6 @@ const dispProg   = makeProgram(VERT_SRC, DISP_SRC);
 
 const EPS = 1e-6;
 
-let zoomTh1Min = -Math.PI;
-let zoomTh1Max = Math.PI;
-let zoomTh2Min = -Math.PI;
-let zoomTh2Max = Math.PI;
 
 const quadBuf = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
@@ -318,8 +410,7 @@ initBuffers();
 
 // Zoom
 
-let zoomMode = false;
-let justZoomed = false;
+
 let dragStart = null;
 const zoomRectEl = document.getElementById('zoomRect');
 const zoomBtn = document.getElementById('zoomBtn');
@@ -546,6 +637,8 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   simTime = 0;
 });
 
+// let imageSaved = false;
+
 function frame() {
   const steps = parseInt(speedEl);
   simStep(steps);
@@ -553,12 +646,17 @@ function frame() {
   display();
   timerEl.textContent = `t = ${simTime.toFixed(2)}`;
   requestAnimationFrame(frame);
+  // if (!imageSaved && simTime >= 50) {
+  //   saveCanvas();
+  //   imageSaved = true;
+  // }
 }
 
 MathJax.startup.promise.then(() => {
   requestAnimationFrame(frame);
 });
 
+// }
 
 // INSPECTOR: single-pendulum CPU simulation shown on click
 
@@ -706,3 +804,10 @@ canvas.addEventListener('click', (e) => {
 
   openInspector(th1_0, th2_0, e.pageX, e.pageY);
 });
+
+// function saveCanvas() {
+//   const link = document.createElement('a');
+//   link.download = `pendulum_mode_${document.getElementById('colormode').value}.png`;
+//   link.href = canvas.toDataURL('image/png');
+//   link.click();
+// }
