@@ -34,10 +34,10 @@ p.setup = function() {
   bgColor = getComputedStyle(document.body).backgroundColor;
   textColor = getComputedStyle(document.body).color;
 
-  p.canvas.oncontextmenu = function(e) {
-    e.preventDefault();
-    return false;
-  };
+  // p.canvas.oncontextmenu = function(e) {
+  //   e.preventDefault();
+  //   return false;
+  // };
 
   let X1 = [-100,100];
   let X2 = [100,100];
@@ -116,7 +116,7 @@ p.draw = function() {
   L = L_slider.val;
 
   
-  p.show_line(p.compute_exact_catenary(anchor1.position, anchor2.position, L));
+  // p.show_line(p.compute_exact_catenary(anchor1.position, anchor2.position, L));
   
 
   // p.fill(p.color(33, 150, 243));

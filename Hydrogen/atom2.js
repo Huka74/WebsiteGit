@@ -113,6 +113,7 @@ function Y(theta,phi,l,m){
 
 // === Marching Cubes setup ===
 const resolution = 75;
+// const resolution = 150;
 const material = new THREE.MeshStandardMaterial({
   color: 0x156289,
   metalness: 0.2,
@@ -128,7 +129,7 @@ const material = new THREE.MeshStandardMaterial({
 const matPos = new THREE.MeshStandardMaterial({
   color: 0x1e90ff, // blue for f > 0
   transparent: true,
-  roughness: 0.5,
+  // roughness: 0.5,
   depthWrite: false,
   opacity: 0.6
 });
@@ -136,7 +137,7 @@ const matPos = new THREE.MeshStandardMaterial({
 const matNeg = new THREE.MeshStandardMaterial({
   color: 0xff4040, // red for f < 0
   transparent: true,
-  roughness: 0.5,
+  // roughness: 0.5,
   depthWrite: false,
   opacity: 0.6
 });

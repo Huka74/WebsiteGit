@@ -129,7 +129,7 @@ p.draw = function() {
   p.circle(0,0,5);
 
   X_mass = [L*p.cos(theta-p.PI/2),L*p.sin(theta-p.PI/2)];
-  spring(p,X_mass,X_attach,10,0.2,5,p.log((1.718281828)*k+1));
+  spring(p,X_mass,X_attach,10,15,5,p.log((1.718281828)*k+1));
   p.line(X_mass[0],X_mass[1],0,0);
   // p.circle(X_mass[0],X_mass[1],2*R_mass);
   mass1.position = X_mass;
@@ -225,32 +225,42 @@ p.show_potential_color = function(){
   let V_arr = x_plot.map(x => p.V(x))
   let max_arr = Math.max(...V_arr);
   let min_arr = Math.min(...V_arr);
+  let show_constant = false;
+  if((max_arr-min_arr)<1e-5){
+    show_constant = true;
+  }
   // console.log(V_arr)
   p.strokeWeight(1)
+  p.stroke(p.color_grad(0));
   for(let i=0; i<N_graph-1; ++i){
-    p.stroke(p.color_grad((V_arr[i]-min_arr)/(max_arr-min_arr)))
+    if(!show_constant){
+      p.stroke(p.color_grad((V_arr[i]-min_arr)/(max_arr-min_arr)));
+    }
     p.line(L*p.cos(x_plot[i]-p.PI/2),L*p.sin(x_plot[i]-p.PI/2),L*p.cos(x_plot[(i+1)%N_graph]-p.PI/2),L*p.sin(x_plot[(i+1)%N_graph]-p.PI/2))
-    p.line(30*x_plot[i],-150,30*x_plot[i+1],-150)
+    p.line(30*x_plot[i],-150,30*x_plot[i+1],-150);
   }
 }
 
 p.color_grad = function(x){
-  return p.color(255*x,255*(1-x),0);
+  // return p.color(255*x,255*(1-x),0);
+  return p.lerpColor(p.color(0,255,115),p.color(0,0,117),x);
 }
 
 p.show_equi = function(arr){
-  p.strokeWeight(3)
+  p.strokeWeight(3);
   if(arr.length!=0){
   for(let angle of arr){
-    p.stroke(255*(1-angle[1]),255*angle[1],0)
+    // p.stroke(255*(1-angle[1]),255*angle[1],0);
+    p.stroke(p.color_grad(1-angle[1]));
     p.line(L*p.cos(angle[0])*0.95,L*p.sin(angle[0])*0.95,L*p.cos(angle[0])*1.05,L*p.sin(angle[0])*1.05)
 
-    pos = A.co2pix([angle[0]+p.PI/2,0])
-    p.line(pos[0],pos[1]-5,pos[0],pos[1]+5)
+    pos = A.co2pix([angle[0]+p.PI/2,0]);
+    p.line(pos[0],pos[1]-5,pos[0],pos[1]+5);
   }
-  p.stroke(255*(1-arr[1][1]),255*arr[1][1],0)
-  pos = A.co2pix([-p.PI,0])
-  p.line(pos[0],pos[1]-5,pos[0],pos[1]+5)
+  // p.stroke(255*(1-arr[1][1]),255*arr[1][1],0);
+  p.stroke(p.color_grad(1-arr[1][1]));
+  pos = A.co2pix([-p.PI,0]);
+  p.line(pos[0],pos[1]-5,pos[0],pos[1]+5);
 
   p.stroke(255)}
 }

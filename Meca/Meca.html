@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Part 1</title>
+    <title>Stationnary points</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mathjs@11.9.0/lib/browser/math.js"></script>
 
@@ -24,6 +24,17 @@
     <script src="navbar.js"></script>
     <link rel="stylesheet" href="style.css">
 
+    <style>
+      .cases-title{
+        margin-top: 30px;
+        margin-bottom: 10px;
+        font-size: 18px;
+      }
+      .cases-body{
+        margin-left: 30px;
+      }
+    </style>
+
 </head>
 
 <div style="display:none">
@@ -40,9 +51,7 @@
 <div class="main-content">
 
 
-    <h1>Mechanic</h1>
-    <p>This is the content for Part 1.</p>
-    <a href="index.html">Back to Home</a>
+    <h1>Stationnary point analysis</h1>
     
     <p>
         Let's take as an example a point of mass \(\textcolor{green}{m}\), restricted to move on a circle of radius \(L\), subject to gravity \(\textcolor{blue}{\vec{g}}\).
@@ -98,27 +107,85 @@
     \end{split}
     \]
 
-    Analyzing the stationnary points, we set \(\frac{\mathrm{d}V}{\mathrm{d}\theta}=0\). Having quite a bit of parameters, we will analyze the stationnary points step by step.
+    Analyzing the stationary points, we set \(\frac{\mathrm{d}V}{\mathrm{d}\theta}=0\). Having quite a bit of parameters, we will analyze the stationary points step by step.
 
-    <br><br>Trivial case: \(\textcolor{red}{k}=0, \textcolor{blue}{g}=0\)<br><br>
+    <div class="cases-title">\(\bullet\) Trivial case: \(\textcolor{red}{k}=0, \textcolor{blue}{g}=0\)</div>
+    <div class="cases-body">
+      Removing all forces acting on the mass leave it free to move on the circle.
+      You can see on the
+      <!-- <a href="#p5-container-meca" class="custom-link">canvas</a> -->
+      <a href="#p5-container-meca" class="custom-link" onclick="
+      const t = document.getElementById('p5-container-meca'),
+      r = t.getBoundingClientRect();
+      window.scrollTo({top:r.bottom+window.scrollY-r.height/2-window.innerHeight/2,behavior:'smooth'});
+      return false;">animation</a>
+      that the potential is constant, and so the particle moves freely (appart from friction added to the simulation).
+    </div>
 
-    Removing all forces acting on the mass leave it free to move on the circle. You can see on the <a href="#p5-container-meca" class="custom-link">canvas</a> that the potential is constant, and so the particle moves freely (appart from friction added to the simulation).
 
-    <br><br>Second case: \(\textcolor{red}{k}=0, \textcolor{blue}{g}\ne0\)<br><br>
+    <div class="cases-title">\(\bullet\) Second case: \(\textcolor{red}{k}=0, \textcolor{blue}{g}\ne0\)</div>
+    <div class="cases-body">
+      This is a simple pendulum, with potential \(V(\theta) = -mgL\cos\theta\). <br>
+      The stationary positions are \(\theta = 0,\pi\), at the bottom and the top of the circle.
+      Considering the stability of those points, we need to look at the sign of the second derivative of the potential. <br>
+      \[\frac{\mathrm{d}^2V}{\mathrm{d}\theta^2}(\theta) = mgl\cos\theta, \quad \frac{\mathrm{d}^2V}{\mathrm{d}\theta^2}(0) > 0, \quad \frac{\mathrm{d}^2V}{\mathrm{d}\theta^2}(\pi) < 0\] <br>
+      So, as expected, the bottom is stable and the top is unstable.
+    </div>
 
-    This is a simple pendulum, with potential \(V(\theta) = -mgL\cos\theta\). The stationnary positions are \(\theta = 0,\pi\), at the bottom and the top of the circle.
-    Considering the stability of those points, we need to look at the sign of the second derivative of the potential.
-    \(\frac{\mathrm{d}^2V}{\mathrm{d}\theta^2}(\theta) = mgl\cos\theta, \quad \frac{\mathrm{d}^2V}{\mathrm{d}\theta^2}(0) > 0, \quad \frac{\mathrm{d}^2V}{\mathrm{d}\theta^2}(\pi) < 0\)
-    So, as expected, the bottom is stable and the top is unstable.
 
-    <br><br>Third case: \(\textcolor{red}{k}\ne0, \textcolor{blue}{g}=0\)<br><br>
+    <div class="cases-title">\(\bullet\) Third case: \(\textcolor{red}{k}\ne0, \textcolor{blue}{g}=0\)</div>
+    <div class="cases-body">
+      This case is interesting as it shows how stability analysis can tell you how changing a parameter 
+      can make a stable stationary point, instable, and vice-versa.
+      The stationary points verify 
+      \[\frac{\mathrm{d}V}{\mathrm{d}\theta} = -L(L+d)\textcolor{red}{k}\sin\theta\left(1-\frac{l_0}{\sqrt{L^2+(L+d)^2+2L(L+d)\cos\theta}}\right)=0\] <br>
+      Solving this for \(\theta\), we can already find two simple solutions setting \(\sin\theta=0\): \(\theta = 0,\pi\), at the bottom and the top of the circle. <br>
+      However, the stability depends on the parameters of the problem. The second derivative gives
+      \[\frac{\mathrm{d}^2V}{\mathrm{d}\theta^2}(\theta) = -L(L+d)\textcolor{red}{k}\left(\cos\theta\left(1-\frac{l_0}{\sqrt{L^2+(L+d)^2+2L(L+d)\cos\theta}}\right)-\sin^2\theta\frac{l_0L(L+d)}{\left(L^2+(L+d)^2+2L(L+d)\cos\theta\right)^{\frac{3}{2}}}\right)\]
+      \[\frac{\mathrm{d}^2V}{\mathrm{d}\theta^2}(0) = L(L+d)\textcolor{red}{k}\left(\frac{l_0}{2L+d}-1\right),\quad \frac{\mathrm{d}^2V}{\mathrm{d}\theta^2}(\pi) = L(L+d)\textcolor{red}{k}\left(1-\frac{l_0}{d}\right)\]
+      Imposing the second derivative to be positive, we find that the bottom is stable iff \(l_0>2L+d\)
+      and the top is stable iff \(l_0 &lt; d\). <br>
+      These stability condition were expected. 
+      For example, for the top point to be stable, the rest length of the spring 
+      must be smaller than the distance between the top of the circle and the anchor point of the spring, i.e. \(l_0&lt; d\).
+      If it was not the case, the spring would want to expand, pushing the mass out of the top position,
+      until its length match its rest length. <br>
+      Similarly, for the bottom point to be stable, the rest length of the spring must be greater than 
+      the distance between the bottom of the circle and the anchor point of the spring, i.e. \(l_0>2L+d\).
+      If it was not the case, the spring would want to contract, pulling the mass out of the bottom position,
+      until its length match its rest length.
 
-    This case is more interesting, as it shows how stability analysis can tell you how changing a parameter can make a stable stationnary point, instable, and vice-versa.<br>
-    
+      This can be seen in the
+      <a href="#p5-container-meca" class="custom-link" onclick="
+      const t = document.getElementById('p5-container-meca'),
+      r = t.getBoundingClientRect();
+      window.scrollTo({top:r.bottom+window.scrollY-r.height/2-window.innerHeight/2,behavior:'smooth'});
+      return false;">animation</a>
+      where \(L=50\). Using the default value for \(d=60\), we can see that \(\theta=0\) is stable only after \(l_0>160\),
+      and that \(\theta=\pi\) is stable only for \(l_0&lt;60\). <br><br>
 
-    <br><br>General case: \(\textcolor{red}{k}\ne0, \textcolor{blue}{g}=0\)<br><br>
+      This is for the two solutions \(\theta=0,\pi\), but there exist other stationary points setting the other part to 0.
+      \[1-\frac{l_0}{\sqrt{L^2+(L+d)^2+2L(L+d)\cos\theta}}=0
+      \quad \Longrightarrow \quad \theta_\pm=\pm\text{arccos}\left(\frac{l_0^2-L^2-(L+d)^2}{2L(L+d)}\right)\]
+      Analyzing the stability of those two points, we get
+      \[\frac{\mathrm{d}^2V}{\mathrm{d}\theta^2}(\theta_\pm) = -\sin^2\left(\theta_\pm\right)\frac{L(L+d)}{l_0^2}&lt;0\]
+      which is always negative. So those two points are always stable. <br>
+      However, they do not always exist:
+      for the \(\text{arccos}\) to be defined, we need 
+      \[-1 \le \frac{l_0^2-L^2-(L+d)^2}{2L(L+d)} \le 1 \quad \Longrightarrow \quad d\le l_0 \le 2L+d\]
+    </div>
 
-    Two simple solutions are \(\theta = 0,\pi\), at the bottom and the top of the circle.
+    <div class="cases-title">\(\bullet\) General case: \(\textcolor{red}{k}\ne0, \textcolor{blue}{g}\ne0\)</div>
+    <div class="cases-body">
+      The stationary points \(\theta=0,\pi\) always exist. <br>
+      \(\theta=0\) is stable for 
+      \(l_0&lt;d\left(1-\frac{mg}{(L+d)k}\right)\) and unstable otherwise, and 
+      \(\theta=\pi\) is stable for 
+      \(l_0>(2L+d)\left(1-\frac{mg}{(L+d)k}\right)\) and unstable otherwise. <br>
+      For \(d\left(1-\frac{mg}{(L+d)k}\right)&lt;l_0&lt;(2L+d)\left(1-\frac{mg}{(L+d)k}\right)\), two more stationary exist at 
+      \[\theta_\pm=\pm\text{arccos}\left(\frac{(L+d)k}{2L}\left(\frac{l_0}{(L+d)k-mg}\right)^2-\frac{L^2+(L+d)^2}{2L(L+d)}\right)\]
+      and are always stable.
+    </div>
 
 </div>
 </body>

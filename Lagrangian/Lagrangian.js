@@ -10,8 +10,8 @@ let bgColor;
 let textColor;
 
 
-// let Xstart = [250,-100];
-let Xstart = [0,150];
+let Xstart = [-250,0];
+// let Xstart = [0,150];
 let Xend = [150,0];
 let X = [];
 let m = 1;
@@ -19,7 +19,7 @@ let m = 1;
 let dt = 10;
 
 let D = [];
-let R = 10;
+let R = 8;
 
 let time;
 
@@ -42,14 +42,28 @@ p.setup = function() {
     return false;
   };
 
+  bgColor = getComputedStyle(document.body).backgroundColor;
+  textColor = getComputedStyle(document.body).color;
+
+  const themeObserver = new MutationObserver(() => {
+    bgColor = getComputedStyle(document.body).backgroundColor;
+    textColor = getComputedStyle(document.body).color;
+  });
+  themeObserver.observe(document.body, { 
+    attributes: true, 
+    attributeFilter: ['class', 'data-theme', 'style'] 
+  });
+
   let Dstart = new Draggable(p,Xstart,[R]);
   let Dend = new Draggable(p,Xend,[R]);
   D.push(Dend);
   D.push(Dstart);
   D[1].handleDrag = p.handleDrag_half("L");
   D[0].handleDrag = p.handleDrag_half("R");
+  D[1].show_shadow = p.create_show_shadow_draggable();
+  D[0].show_shadow = p.create_show_shadow_draggable();
 
-  time = new ValueSlider(p,[-100,150],[25],5000,[1000,10000],1/50,container,"t",0);
+  time = new ValueSlider(p,[-200,250],[25],5000,[1000,10000],1/50,container,"t",0);
 
   UIObjects.push(Dend,Dstart,time);
 
@@ -58,15 +72,31 @@ p.setup = function() {
 p.handleDrag_half = function(side){
   if(side=="R"){
     return function(mouseX,mouseY){
-      this.position = [p.min(p.max(mouseX,0),w/2),p.min(p.max(mouseY,-h/2),h/2)];
+      this.position = [p.min(p.max(mouseX,0),w/2-R),p.min(p.max(mouseY,-h/2+R),h/2-R)];
     }
   } else if(side=="L"){
     return function(mouseX,mouseY){
-      this.position = [p.min(p.max(mouseX,-w/2),0),p.min(p.max(mouseY,-h/2),h/2)];
+      this.position = [p.min(p.max(mouseX,-w/2+R),0),p.min(p.max(mouseY,-h/2+R),h/2-R)];
     }
   }
 }
 
+p.create_handle_drag = function(){
+  return function(mouseX,mouseY){
+      this.position = [p.min(p.max(mouseX,-w/2+R),w/2-R),p.min(p.max(mouseY,-h/2+R),h/2-R)];
+    }
+}
+p.create_show_shadow_draggable = function(){
+  return function(){
+    let l = 10;
+    p.fill(p.lerpColor(p.color(bgColor),p.color(textColor),0.1));
+    p.stroke(p.lerpColor(p.color(bgColor),p.color(textColor),0.5));
+    arrow(p,[this.position[0]-l,this.position[1]],10,5,8,p.PI/2);
+    arrow(p,[this.position[0]+l,this.position[1]],10,5,8,-p.PI/2);
+    arrow(p,[this.position[0],this.position[1]-l],10,5,8,p.PI);
+    arrow(p,[this.position[0],this.position[1]+l],10,5,8,0);
+  }
+}
 
 
 
@@ -77,11 +107,8 @@ let translation = [w/2,h/2];
 let scaling = [1,-1];
 
 p.draw = function() {
-  bgColor = getComputedStyle(document.body).backgroundColor;
-  textColor = getComputedStyle(document.body).color;
-
-  // p.background(bgColor);
-  p.background(240);
+  p.background(bgColor);
+  // p.background(240);
   p.translate(translation[0],translation[1]);
   p.scale(scaling[0],scaling[1]);
 
@@ -274,6 +301,10 @@ p.compute_traj_full = function(T){
   }
 
   // return p.compute_traj(0,2*p.PI,params)
+
+  if(draggedObject){
+    draggedObject.show_shadow();
+  }
 }
 
 p.mod = function(a,m){
@@ -481,6 +512,8 @@ p.catmullRom = function(p0, p1, p2, p3, t) {
 p.modify_points = function(mousePos){
   if (p.mouseButton === p.LEFT){
     draggable = new Draggable(p,mousePos,[R]);
+    draggable.show_shadow = p.create_show_shadow_draggable();
+    draggable.handleDrag = p.create_handle_drag();
     D.push(draggable);
     UIObjects.push(draggable);
 
@@ -500,8 +533,11 @@ p.mousePressed = function(){
       return false;
     }
   }
-
-  p.modify_points(mousePos);
+  
+  in_canvas = (p.mouseX>0) && (p.mouseX<w) && (p.mouseY>0) && (p.mouseX<h);
+  if(in_canvas){
+    p.modify_points(mousePos);
+  }
 
   return false;
 }

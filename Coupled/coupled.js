@@ -20,6 +20,8 @@ let r = math.sqrt(d**2 + k1**2/(m1*m2));
 
 let x10 = d-r;
 let x20 = -k1/m1;
+// let x10 = 0;
+// let x20 = 0;
 let v10 = 0;
 let v20 = 0;
 let Q10 = (d-r)*x10 - k1/m2*x20;
@@ -250,6 +252,18 @@ p.setup = function() {
     div_mass_label2.style("color", 'rgb(0, 0, 0)');
   
 
+  // Color theme
+  bgColor = getComputedStyle(document.body).backgroundColor;
+  textColor = getComputedStyle(document.body).color;
+
+  const themeObserver = new MutationObserver(() => {
+    bgColor = getComputedStyle(document.body).backgroundColor;
+    textColor = getComputedStyle(document.body).color;
+  });
+  themeObserver.observe(document.body, { 
+    attributes: true, 
+    attributeFilter: ['class', 'data-theme', 'style'] 
+  });
 
 }
 
@@ -310,11 +324,9 @@ let translation = [w/2-40,h/2-200];
 let scaling = [1,-1];
 
 p.draw = function() {
-  bgColor = getComputedStyle(document.body).backgroundColor;
-  textColor = getComputedStyle(document.body).color;
 
-  // p.background(bgColor);
-  p.background(220);
+  p.background(bgColor);
+  // p.background(220);
   p.translate(translation[0],translation[1]);
   p.scale(scaling[0],scaling[1]);
 

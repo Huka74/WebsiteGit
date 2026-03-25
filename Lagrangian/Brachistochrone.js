@@ -138,9 +138,9 @@ p.setup = function() {
       this.pressed = 0
     }
   }
-  // button_scene[0].show = function(){
-    
-  // }
+  
+  // button_scene[1].val = 1;
+  // button_play.val = 1;
 
   UIObjects = P.concat([Pstart, Pend, button_play],button_scene);
 
@@ -192,9 +192,6 @@ p.draw = function() {
     ind_scene += 1;
   }
 
-  // Show end points
-  Pstart.show();
-  Pend.show();
 
   // Show button_play
   button_play.show();
@@ -259,7 +256,6 @@ p.draw = function() {
   p.show_line([xs,ys]);
   p.stroke(textColor);
 
-
   const T = p.abs(params[1]*math.sqrt(params[0]/g));
 
   // If scene change, reset animation
@@ -271,6 +267,9 @@ p.draw = function() {
 
   // Animation
   if(button_play.val){
+    // if(t>7){
+    //   dt = 0;
+    // }
     t += dt;
     // Particle on brachistochrone
     if(t<T){
@@ -329,6 +328,7 @@ p.draw = function() {
         x = arr_n_trajectories[i][time_step][0] + inter * (arr_n_trajectories[i][time_step+1][0] - arr_n_trajectories[i][time_step][0]);
         y = arr_n_trajectories[i][time_step][1] + inter * (arr_n_trajectories[i][time_step+1][1] - arr_n_trajectories[i][time_step][1]);
         p.stroke(p.lerpColor(p.color(0, 187, 255),p.color(240, 0, 255),i/(n_trajectories-1)));
+        p.fill(p.lerpColor(p.color(0, 187, 255),p.color(240, 0, 255),i/(n_trajectories-1)));
         p.circle(x,y,2*5);
         }
       }
@@ -364,6 +364,9 @@ p.draw = function() {
     p.line(pos_min[0]+2,pos_min[1],pos_min[0]-2,pos_min[1]);
   }
 
+  // Show end points
+  Pstart.show();
+  Pend.show();
 
 
   for(let obj of UIObjects){
@@ -378,7 +381,7 @@ p.draw = function() {
 
 p.update_n_trajectories = function(){
   // let a = linspace(0.15,1,n_trajectories);
-  let a = [0.15,0.35,0.5,0.85,1];
+  let a = [0.15,0.35,0.48,0.8,1];
   for(let i=0; i<n_trajectories; i+=1){
     let x_mid_point = (Pend.position[0]-Pstart.position[0])*(1/2)**(1/a[i]) + Pstart.position[0];
     let x = linspace(x_mid_point,Pend.position[0],100);

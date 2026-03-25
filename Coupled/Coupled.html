@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Part 1</title>
+    <title>Coupled systems</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mathjs@11.9.0/lib/browser/math.js"></script>
 
@@ -13,18 +13,23 @@
     src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js">
     </script>
 
-    <link rel="stylesheet" href="/style.css">
+    <base href="/WebsiteGit/">
+    <!-- <base href="/"> -->
+    <script src="navbar.js"></script>
+    <link rel="stylesheet" href="style.css">
 
 </head>
 
 <body>
 
 
+<div style="display:none">
 \(\definecolor{green}{RGB}{105,156,82}\)
 \(\definecolor{blue}{RGB}{35,107,142}\)
 \(\definecolor{red}{RGB}{207,80,68}\)
 \(\definecolor{yellow}{RGB}{232,193,28}\)
 \(\definecolor{orange}{RGB}{199,141,70}\)
+</div>
 
 
 <div class="main-content">
@@ -32,8 +37,6 @@
     
 
     <h1>Coupled systems</h1>
-    <p>This is the content for Part 1.</p>
-    <a href="/Home/index.html">Back to Home</a>
 
     Let \(m_1\) and \(m_2\) be two masses attached to two opposite walls and each other with springs.
     The stiffness of the springs are \(k_0,k_1,k_2\), and their equilibirum lengths \(L_0,L_1,L_2\).
@@ -43,7 +46,7 @@
 
     <div id="p5-container-meca-coupled-trim"
     data-show="0"
-    style="position: relative; height:200px; width:600px; left:25%; top:0px;">
+    style="position: relative; height:200px; width:600px; margin-left: auto; margin-right: auto;">
     </div>
 
     Finding the evolution of the system might seem complicated, where the dynamic of the first

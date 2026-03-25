@@ -38,6 +38,15 @@ p.setup = function() {
   bgColor = getComputedStyle(document.body).backgroundColor;
   textColor = getComputedStyle(document.body).color;
 
+  const themeObserver = new MutationObserver(() => {
+    bgColor = getComputedStyle(document.body).backgroundColor;
+    textColor = getComputedStyle(document.body).color;
+  });
+  themeObserver.observe(document.body, { 
+    attributes: true, 
+    attributeFilter: ['class', 'data-theme', 'style'] 
+  });
+
   p.canvas.oncontextmenu = function(e) {
     e.preventDefault();
     return false;
@@ -48,7 +57,7 @@ p.setup = function() {
   div_axis_labelx.style("font-size", "12px");
   div_axis_labelx.style("transform", "translate(-50%, -50%)");
   div_axis_labelx.style("user-select", "none");
-  div_axis_labelx.style("color", 'rgb(0, 0, 0)');
+  div_axis_labelx.style("color", textColor);
 
   axis = new Axes(p,[-125,0],[100,100],p.color(textColor));
   t = linspace(0,1,100);
@@ -61,6 +70,7 @@ p.setup = function() {
   T.handleDrag = p.handleDrag_dir("x");
   T.show = function(){
     div_axis_labelx.position(this.position[0]*scaling[0]+translation[0],this.position[1]*scaling[1]+translation[1]);
+    div_axis_labelx.style("color", textColor);
     katex.render("T",div_axis_labelx.elt);
   }
   traj = new Draggable(p,[0,0],[0]);
@@ -78,17 +88,34 @@ p.setup = function() {
   }
 
   button_play = new Button(p,[axis.pos[0]-125,-25],[15],2);
+  // button_play.show = function(){
+  //   if(this.val){
+  //     p.circle(this.position[0], this.position[1],2*10);
+  //     let L = 9;
+  //     p.rect(this.position[0]-L/2,this.position[1]-L/2,L,L);
+  //   } else {
+  //     p.circle(this.position[0], this.position[1],2*10);
+  //     let L = 10;
+  //     p.triangle(this.position[0]-Math.sqrt(3)/6*L,this.position[1]-L/2,
+  //                this.position[0]-Math.sqrt(3)/6*L,this.position[1]+L/2,
+  //                this.position[0]+Math.sqrt(3)/3*L,this.position[1]);
+  //   }
+  // }
   button_play.show = function(){
+    offset = this.pressed ? -3 : -2*this.val;
+    p.fill(textColor);
+    p.circle(this.position[0], this.position[1]-3.5,2*15);
+    p.fill(bgColor);
+    p.stroke(textColor);
+    p.circle(this.position[0], this.position[1] + offset,2*15);
     if(this.val){
-      p.circle(this.position[0], this.position[1],2*10);
-      let L = 9;
-      p.rect(this.position[0]-L/2,this.position[1]-L/2,L,L);
+      let L = 13;
+      p.rect(this.position[0]-L/2,this.position[1]-L/2 + offset,L,L);
     } else {
-      p.circle(this.position[0], this.position[1],2*10);
-      let L = 10;
-      p.triangle(this.position[0]-Math.sqrt(3)/6*L,this.position[1]-L/2,
-                 this.position[0]-Math.sqrt(3)/6*L,this.position[1]+L/2,
-                 this.position[0]+Math.sqrt(3)/3*L,this.position[1]);
+      let L = 15;
+      p.triangle(this.position[0]-Math.sqrt(3)/6*L,this.position[1]-L/2 + offset,
+                 this.position[0]-Math.sqrt(3)/6*L,this.position[1]+L/2 + offset,
+                 this.position[0]+Math.sqrt(3)/3*L,this.position[1] + offset);
     }
   }
 
@@ -100,7 +127,6 @@ p.setup = function() {
   div_action.style("font-size", "12px");
   div_action.style("transform", "translate(-50%, -50%)");
   div_action.style("user-select", "none");
-  div_action.style("color", 'rgb(0, 0, 0)');
   div_action.position(translation[0]+200,translation[1]+25);
   div_action.style("color", textColor);
 
@@ -109,18 +135,18 @@ p.setup = function() {
   div_z.style("font-size", "12px");
   div_z.style("transform", "translate(-50%, -50%)");
   div_z.style("user-select", "none");
-  div_z.style("color", 'rgb(0, 0, 0)');
   div_z.position(translation[0]+axis.pos[0],translation[1]+axis.pos[1]-110);
   div_z.style("color", textColor);
+  katex.render("z",div_z.elt);
 
   div_z2 = p.createDiv();
   div_z2.parent(container);
   div_z2.style("font-size", "12px");
   div_z2.style("transform", "translate(-50%, -50%)");
   div_z2.style("user-select", "none");
-  div_z2.style("color", 'rgb(0, 0, 0)');
   div_z2.position(translation[0]+axis.pos[0]-150,translation[1]+axis.pos[1]-110);
   div_z2.style("color", textColor);
+  katex.render("z",div_z2.elt);
 }
 
 p.handleDrag_dir = function(dir){
@@ -138,11 +164,9 @@ p.handleDrag_dir = function(dir){
 //////// DRAW ////////
 
 p.draw = function() {
-  bgColor = getComputedStyle(document.body).backgroundColor;
-  textColor = getComputedStyle(document.body).color;
 
-  // p.background(bgColor);
-  p.background(200);
+  p.background(bgColor);
+  // p.background(200);
   p.translate(translation[0],translation[1]);
   p.scale(scaling[0],scaling[1]);
 
@@ -163,7 +187,7 @@ p.draw = function() {
   p.fill(textColor)
   arrow(p,axis.pos,T.position[0]-axis.pos[0]-10,1,4,-p.PI/2);
   arrow(p,axis.pos,100,1,4,0);
-  katex.render("z",div_z.elt);
+  div_z.style("color", textColor);
   axis.plot(t,t.map(x => p.f(x,g,T_time,y1_axis,y2_axis)));
   axis.plot(t,t.map(x => p.f(x,g_,T_time,y1_axis,y2_axis)));
 
@@ -176,8 +200,9 @@ p.draw = function() {
   
   button_play.show();
   p.fill(textColor);
+  p.stroke(textColor);
   arrow(p,[axis.pos[0]-150,0],100,1,4,0);
-  katex.render("z",div_z2.elt);
+  div_z2.style("color", textColor);
 
   let l = 2;
   p.line(axis.pos[0]-125+l,y1.position[1]+l,axis.pos[0]-125-l,y1.position[1]-l);
@@ -204,6 +229,7 @@ p.draw = function() {
 
   S_diff = p.compute_action(g_,T_time,y1_axis,y2_axis)-p.compute_action(g,T_time,y1_axis,y2_axis);
   p.rect(200,-15,10,S_diff*40);
+  div_action.style("color", textColor);
   katex.render("S="+p.str(p.round(S_diff,3)),div_action.elt);
 
 

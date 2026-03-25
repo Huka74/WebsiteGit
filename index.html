@@ -3,44 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grid with p5.js</title>
+    <title>Home</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.9.0/lib/browser/math.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.css">
+    <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js">
+    </script>
 
     <style>
         .grid-item {
             background-color: #3498db;
-            color: white;
+            color: inherit;
             display: flex;
+            margin-left: 100px;
             justify-content: center;
             align-items: center;
+            width: 200px;
             font-size: 20px;
             border-radius: 10px;
-            transition: transform 0.3s ease, background-color 0.3s ease;
+            transition: background-color 0.3s ease;
             z-index: 10;
         }
+        .grid-item:hover{
+            background-color: #53ade8;
+        }
+        .grid-title {
+            background-color: inherit;
+            color: inherit;
+            display: flex;
+            margin-top: 50px;
+            width: 100%;
+            font-size: 22px;
+            z-index: 10;
+        }
+        hr {
+          height: 1px;
+          border: 0;
+          border-top: 1px solid rgb(140, 140, 140);
+          margin-right: 100px;
+          margin-top: 0;
+        }
+        .custom-link2{
+          background-color: inherit;
+          color: inherit;
+          display: flex;
+          width: 100%;
+          font-size: 18px;
+          z-index: 10;
+        }
+        .framed-img {
+          color: var(--text-color);
+          border: 1px solid currentColor;
+        }
+        .theme-img-dark  { display: none; }
+        .theme-img-light { display: inline; }
+        body.dark-theme .theme-img-dark  { display: inline; }
+        body.dark-theme .theme-img-light { display: none; }
     </style>
 
-    <base href="/WebsiteGit/">
+    <!-- <base href="/WebsiteGit/"> -->
+     <base href="/">
     <script src="navbar.js"></script>
     <link rel="stylesheet" href="style.css">
     
+    <script src="DoublePendulum/doublependulum-sketch.js"></script>
 
 </head>
 <body>
-    
+ 
+    <div style="margin-left: 100px; margin-right: 100px;">
 
-    <div>
-        <a href="part2.html" class="grid-item">Part 2</a>
-        <a href="Meca/Meca.html" class="grid-item"> Meca</a>
-        <a href="Hydrogen/Hydrogen.html" class="grid-item"> Hydrogen Atom</a>
-        <a href="Coupled/Coupled.html" class="grid-item"> Coupled systems4</a>
-        <a href="Lagrangian/Lagrangian.html" class="grid-item"> Coupled systems4</a>
+      <div class="grid-title">Newtonian Mechanics</div>
+      <hr>
+
+      <div style="display: flex;  gap: 15px;">
+        <div>
+          <a href="Meca/Meca.html">
+            <!-- <img src="Home/Images/" width="100"  class="framed-img theme-img-light">
+            <img src="Home/Images/" width="100"  class="framed-img theme-img-dark"> -->
+          </a>
+        </div>
+
+        <div>
+          <div>
+            <a href="Meca/Meca.html" class="custom-link2">Stationnary points</a>
+          </div>
+          <div>
+            In <a href="Meca/Meca.html" class="custom-link">this article</a>,
+          </div>
+        </div>
+      </div>
+
+      <br>
+      
+      <div style="display: flex;  gap: 15px;">
+        <div>
+          <a href="Coupled/Coupled.html">
+            <img src="Home/Images/Coupled-light2.png" width="100"  class="framed-img theme-img-light">
+            <img src="Home/Images/Coupled-dark2.png" width="100"  class="framed-img theme-img-dark">
+          </a>
+        </div>
+
+        <div>
+          <div>
+            <a href="Coupled/Coupled.html" class="custom-link2">Coupled systems</a>
+          </div>
+          <div>
+            In <a href="Coupled/Coupled.html" class="custom-link">this article</a>,
+          </div>
+        </div>
+      </div>
+
+        
+      <div class="grid-title">Lagrangian Mechanics</div>
+      <hr>
+
+      <div style="display: flex;  gap: 15px;">
+        <div>
+          <a href="DoublePendulum/DoublePendulum.html">
+            <!-- <div id="p5-container-doublependulum-sketch"
+              data-scale="0.5" data-tx="-40" data-ty="40"
+              style="position: relative; height:100px; width: 100px; margin-left: auto; margin-right: auto;"
+              class="framed-img">
+            </div> -->
+            <img src="Home/Images/DoublePendulum-light.png" width="100"  class="framed-img theme-img-light">
+            <img src="Home/Images/DoublePendulum-dark.png" width="100"  class="framed-img theme-img-dark">
+          </a>
+          </a>
+        </div>
+
+        <div>
+          <div>
+            <a href="DoublePendulum/DoublePendulum.html" class="custom-link2">Double Pendulum</a>
+          </div>
+          <div>
+            In <a href="DoublePendulum/DoublePendulum.html" class="custom-link">this article</a>,
+            the equation of motion of the double pendulum are derived, with the normal modes
+            analysis for small angles. 
+          </div>
+        </div>
+      </div>
+
+      <br>
+    
+      <div style="display: flex;  gap: 15px;">
+        <div>
+          <a href="DoublePendulum/DoublePendulumPeriodic.html">
+            <img src="DoublePendulum/Lyapunov.png" width="100"  class="framed-img">
+          </a>
+        </div>
+
+        <div>
+          <div>
+            <a href="DoublePendulum/DoublePendulumPeriodic.html" class="custom-link2">Double Pendulum Periodic</a>
+          </div>
+          <div>
+            In <a href="DoublePendulum/DoublePendulumPeriodic.html" class="custom-link">this article</a>,
+            some examples of initial condition that result in some periodic or quasi-periodic trajectories are shown. 
+          </div>
+        </div>
+      </div>
+
+      <br>
+
+      <div style="display: flex;  gap: 15px;">
+        <div>
+          <a href="Lagrangian/Brachistochrone.html">
+            <img src="Home/Images/Brachistochrone-light3.png" width="100"  class="framed-img theme-img-light">
+            <img src="Home/Images/Brachistochrone-dark3.png" width="100"  class="framed-img theme-img-dark">
+          </a>
+        </div>
+
+        <div>
+          <div>
+            <a href="Lagrangian/Brachistochrone.html" class="custom-link2">Brachistochrone</a>
+          </div>
+          <div>
+            In <a href="Lagrangian/Brachistochrone.html" class="custom-link">this article</a>,
+            the famous Brachistochrone problem is solved using the Lagrangian formalism
+            and the tautochrone property is derived. <br>
+            An iteractive animation can be used to see the Brachistochrone curve for draggable
+            starting and ending points. Three scenes can be toggled to compare the travel time of the Brachistochrone
+            curve with custom spline curves, compare with a set of intiutive curves, and to see
+            the tautochrone property in action.
+          </div>
+        </div>
+      </div>
+
+      <br>
+
+      <div style="display: flex;  gap: 15px;">
+        <div>
+          <a href="Lagrangian/Catenary.html">
+            <img src="Home/Images/Catenary-light.png" width="100"  class="framed-img theme-img-light">
+            <img src="Home/Images/Catenary-dark.png" width="100"  class="framed-img theme-img-dark">
+          </a>
+        </div>
+
+        <div>
+          <div>
+            <a href="Lagrangian/Catenary.html" class="custom-link2">Catenary</a>
+          </div>
+          <div>
+            In <a href="Lagrangian/Catenary.html" class="custom-link">this article</a>,
+            the shape of a hanging chain is derived using the Lagrangian formalism. <br>
+            An interactive animation can be used to see how a chain reacts when moving
+            its anchor points, and how it coincides with the analytical shape derived.
+          </div>
+        </div>
+      </div>
+
+
+      <div class="grid-title">Quantum</div>
+      <hr>
+      <div style="display: flex;  gap: 15px;">
+        <div>
+          <a href="Hydrogen/Hydrogen.html">
+            <img src="Home/Images/Hydrogen.png" width="100"  class="framed-img">
+          </a>
+        </div>
+
+        <div>
+          <div>
+            <a href="Hydrogen/Hydrogen.html" class="custom-link2">Hydrogen orbitals</a>
+          </div>
+          <div>
+            In <a href="Hydrogen/Hydrogen.html" class="custom-link">this article</a>,
+            the electronic orbitals of the hydrogen atom are derived using only
+            the Schrödinger equation. All the quantum numbers naturally comes form
+            the condition that the wavefunction is normalizable.
+          </div>
+        </div>
+      </div>
 
     </div>
 
-    <!-- <script src="pendulum.js"></script>
-    <script src="dipole.js"></script> -->
-    <!-- <script src="test.js"></script> -->
 
 </body>
+
 </html>
