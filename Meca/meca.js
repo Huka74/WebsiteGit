@@ -348,7 +348,7 @@ p.mouseDragged = function(){
     draggedObject.handleDrag(mousePos[0], mousePos[1]);
   }
 
-  return false;
+  // return false;
 }
 
 p.mouseReleased = function(){
