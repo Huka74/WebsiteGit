@@ -85,12 +85,13 @@ class Draggable extends UIObject{
 }
 
 class ValueSlider extends UIObject{
-  constructor(p, position, r_hitbox, val, val_lim,distance, container, name="", precision=1, color=p.color(255,0,0)){
+  constructor(p, position, r_hitbox, val, val_lim,distance, container, name="", precision=1, color=p.color(255,0,0), fontsize=12, delta_x=14){
     super(p,position,r_hitbox);
     this.val = val;
     this.val_lim = val_lim;
     this.val_clicked = val;
     this.distance = distance;
+    this.delta_x = delta_x;
 
     this.pos_mouse_clicked;
 
@@ -104,7 +105,7 @@ class ValueSlider extends UIObject{
 
     this.divnum = this.p.createDiv();
     this.divnum.parent(this.container);
-    this.divnum.style("font-size", "11px");
+    this.divnum.style("font-size", p.str(fontsize)+"px");
     this.divnum.position(this.position[0],this.position[1]);
     this.divnum.style("transform", "translate(-50%, -50%)");
     this.divnum.style("user-select", "none");
@@ -112,7 +113,7 @@ class ValueSlider extends UIObject{
 
     this.divname = this.p.createDiv();
     this.divname.parent(this.container);
-    this.divname.style("font-size", "12px");
+    this.divname.style("font-size", p.str(fontsize)+"px");
     this.divname.position(this.position[0],this.position[1]);
     this.divname.style("transform", "translate(-50%, -50%)");
     this.divname.style("user-select", "none");
@@ -142,18 +143,18 @@ class ValueSlider extends UIObject{
     }else if(!this.has_been_clicked){
         this.hover_bool = false;
     }
-    this.divnum.position(translation[0]+scaling[0]*this.position[0],translation[1]+scaling[1]*this.position[1]);
+    this.divnum.position(translation[0]+scaling[0]*this.position[0]+this.delta_x,translation[1]+scaling[1]*this.position[1]);
     this.divnum.style("color", this.color);
     katex.render((this.val).toFixed(this.precision),this.divnum.elt);
 
     if(this.name!=""){
-      this.divname.position(translation[0]+scaling[0]*this.position[0]-28,translation[1]+scaling[1]*this.position[1]);
+      this.divname.position(translation[0]+scaling[0]*this.position[0]-this.delta_x,translation[1]+scaling[1]*this.position[1]);
       this.divname.style("color", this.color);
       katex.render(this.name+"=",this.divname.elt);
     }
 
     if(this.hover_bool){
-      this.show_arrow(this.position,this.r_hitbox[0])
+      this.show_arrow([this.position[0]+this.delta_x,this.position[1]],this.r_hitbox[0])
       this.p.strokeWeight(1);
     }
   }

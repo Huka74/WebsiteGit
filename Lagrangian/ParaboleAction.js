@@ -24,6 +24,8 @@ let axis;
 let t;
 let T;
 let g = 1;
+let R = 8;
+let R_hitbox = 15;
 
 p.setup = function() {
   let container = document.getElementById(containerId);
@@ -62,12 +64,18 @@ p.setup = function() {
   axis = new Axes(p,[-125,0],[100,100],p.color(textColor));
   t = linspace(0,1,100);
 
-  y1 = new Draggable(p,[-125,30],[10]);
-  y2 = new Draggable(p,[100,30],[10]);
+  y1 = new Draggable(p,[-125,30],[R_hitbox]);
+  y2 = new Draggable(p,[100,30],[R_hitbox]);
   y1.handleDrag = p.handleDrag_dir("y");
   y2.handleDrag = p.handleDrag_dir("y");
-  T = new Draggable(p,[100,0],[10]);
+  y1.show_shadow = p.create_show_shadow_draggable("y");
+  y2.show_shadow = p.create_show_shadow_draggable("y");
+  y1.show = p.create_show();
+  y2.show = p.create_show();
+
+  T = new Draggable(p,[100,0],[R_hitbox]);
   T.handleDrag = p.handleDrag_dir("x");
+  T.show_shadow = p.create_show_shadow_draggable("x");
   T.show = function(){
     div_axis_labelx.position(this.position[0]*scaling[0]+translation[0],this.position[1]*scaling[1]+translation[1]);
     div_axis_labelx.style("color", textColor);
@@ -159,6 +167,32 @@ p.handleDrag_dir = function(dir){
   }}
 }
 
+p.create_show_shadow_draggable = function(dir){
+  if(dir=="y"){return function(){
+    let l = 10;
+    p.fill(bgColor);
+    p.stroke(textColor);
+    // arrow(p,[this.position[0]-l,this.position[1]],10,5,8,p.PI/2);
+    // arrow(p,[this.position[0]+l,this.position[1]],10,5,8,-p.PI/2);
+    arrow(p,[this.position[0],this.position[1]-l],10,5,8,p.PI);
+    arrow(p,[this.position[0],this.position[1]+l],10,5,8,0);
+  }} else if(dir=="x"){return function(){
+    let l = 10;
+    p.fill(bgColor);
+    p.stroke(textColor);
+    arrow(p,[this.position[0]-l,this.position[1]],10,5,8,p.PI/2);
+    arrow(p,[this.position[0]+l,this.position[1]],10,5,8,-p.PI/2);
+    // arrow(p,[this.position[0],this.position[1]-l],10,5,8,p.PI);
+    // arrow(p,[this.position[0],this.position[1]+l],10,5,8,0);
+  }}
+}
+p.create_show = function(){
+  return function(){
+    p.fill(bgColor);
+    p.stroke(textColor);
+    p.circle(this.position[0],this.position[1],2*R);
+  }
+}
 
 
 //////// DRAW ////////
@@ -227,7 +261,7 @@ p.draw = function() {
 
 
 
-  S_diff = p.compute_action(g_,T_time,y1_axis,y2_axis)-p.compute_action(g,T_time,y1_axis,y2_axis);
+  S_diff = p.abs(p.compute_action(g_,T_time,y1_axis,y2_axis)-p.compute_action(g,T_time,y1_axis,y2_axis));
   p.rect(200,-15,10,S_diff*40);
   div_action.style("color", textColor);
   katex.render("S="+p.str(p.round(S_diff,3)),div_action.elt);
@@ -287,7 +321,7 @@ p.mousePressed = function(){
     }
   }
 
-  return false;
+  // return false;
 }
 
 p.mouseDragged = function(){
@@ -297,7 +331,7 @@ p.mouseDragged = function(){
     draggedObject.handleDrag(mousePos[0], mousePos[1]);
   }
 
-  return false;
+  // return false;
 }
 
 p.mouseReleased = function(){

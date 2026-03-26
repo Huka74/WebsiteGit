@@ -20,9 +20,11 @@ let dt = 10;
 
 let D = [];
 let R = 8;
+let R_hitbox = 15;
 
 let time;
-
+let toggle_traj;
+let div_action;
 
 
 p.setup = function() {
@@ -54,18 +56,54 @@ p.setup = function() {
     attributeFilter: ['class', 'data-theme', 'style'] 
   });
 
-  let Dstart = new Draggable(p,Xstart,[R]);
-  let Dend = new Draggable(p,Xend,[R]);
+  let Dstart = new Draggable(p,Xstart,[R_hitbox]);
+  let Dend = new Draggable(p,Xend,[R_hitbox]);
   D.push(Dend);
   D.push(Dstart);
   D[1].handleDrag = p.handleDrag_half("L");
   D[0].handleDrag = p.handleDrag_half("R");
+  D[1].show = p.create_show();
+  D[0].show = p.create_show();
   D[1].show_shadow = p.create_show_shadow_draggable();
   D[0].show_shadow = p.create_show_shadow_draggable();
 
-  time = new ValueSlider(p,[-200,250],[25],5000,[1000,10000],1/50,container,"t",0);
+  time = new ValueSlider(p,[-200,275],[25],5000,[1000,10000],1/50,container,"\\Delta t",0,p.color(textColor), fontsize=12, delta_x=16);
 
-  UIObjects.push(Dend,Dstart,time);
+  toggle_traj = new Button(p,[0,275],r_hitbox=[40,25,5],max_val=2);
+  toggle_traj.show = function(){
+    p.fill(textColor)
+    p.rect(this.position[0]-this.r_hitbox[0]/2,this.position[1]-this.r_hitbox[1]/2-4, this.r_hitbox[0], this.r_hitbox[1], this.r_hitbox[2]);
+    p.fill(bgColor);
+    offset = this.pressed ? -3*this.pressed : -2*this.val;
+    p.rect(this.position[0]-this.r_hitbox[0]/2,this.position[1]-this.r_hitbox[1]/2+offset, this.r_hitbox[0], this.r_hitbox[1], this.r_hitbox[2]);
+
+    p.arc(this.position[0],this.position[1]-5+offset,25,25,p.PI/2-1.1 ,p.PI/2+1.1);
+    p.arc(this.position[0],this.position[1]+5+offset,25,25,-p.PI/2-1.1,-p.PI/2+1.1);
+    p.circle(this.position[0],this.position[1]+offset,5);
+    p.strokeWeight(2);
+    if(this.val==0){
+      p.line(this.position[0]+10,this.position[1]+offset+10,
+             this.position[0]-10,this.position[1]+offset-10);
+    }
+    p.strokeWeight(1);
+  }
+  toggle_traj.handlePress = function(mouseX, mouseY){
+    this.val = (this.val+1)%this.N_val
+    this.pressed = 1
+  }
+  toggle_traj.handleRelease = function(mouseX, mouseY){
+    this.pressed = 0
+  }
+
+  UIObjects.push(Dend,Dstart,time,toggle_traj);
+
+  div_action = p.createDiv();
+  div_action.parent(container);
+  div_action.style("font-size", "12px");
+  div_action.style("transform", "translate(-50%, -50%)");
+  div_action.style("user-select", "none");
+  div_action.style("color", textColor);
+  div_action.position(translation[0]+scaling[0]*200,translation[1]+scaling[1]*275);
 
 }
 
@@ -89,12 +127,21 @@ p.create_handle_drag = function(){
 p.create_show_shadow_draggable = function(){
   return function(){
     let l = 10;
-    p.fill(p.lerpColor(p.color(bgColor),p.color(textColor),0.1));
-    p.stroke(p.lerpColor(p.color(bgColor),p.color(textColor),0.5));
+    // p.fill(p.lerpColor(p.color(bgColor),p.color(textColor),0.05));
+    // p.stroke(p.lerpColor(p.color(textColor),p.color(bgColor),0.7));
+    p.fill(bgColor);
+    p.stroke(textColor);
     arrow(p,[this.position[0]-l,this.position[1]],10,5,8,p.PI/2);
     arrow(p,[this.position[0]+l,this.position[1]],10,5,8,-p.PI/2);
     arrow(p,[this.position[0],this.position[1]-l],10,5,8,p.PI);
     arrow(p,[this.position[0],this.position[1]+l],10,5,8,0);
+  }
+}
+p.create_show = function(){
+  return function(){
+    p.fill(bgColor);
+    p.stroke(textColor);
+    p.circle(this.position[0],this.position[1],2*R);
   }
 }
 
@@ -118,7 +165,7 @@ p.draw = function() {
   p.fill(textColor);
   p.stroke(textColor);
 
-  
+  toggle_traj.show();
 
   X = p.D_to_X(D);
   trajectory = p.getSplinePoints(X);
@@ -127,12 +174,17 @@ p.draw = function() {
 
   p.circle(0,0,5);
   // p.show_spline(p.compute_traj_full());
-  p.compute_traj_full(time.val)
+  if(toggle_traj.val==0){
+    p.compute_traj_full(time.val);
+  }
   // p.scale(1,-1);
   // p.text(p.round(p.compute_action(trajectory,null,T=time.val),2),0,0);
   // p.scale(1,-1);
+  let S = p.round(p.compute_action(trajectory,null,T=time.val),2);
+  div_action.style("color", textColor);
+  katex.render("S="+p.str(S),div_action.elt);
 
-
+  time.color = textColor;
   time.show(p.mouseX,p.mouseY,translation,scaling);
 
   for(let d of D){
@@ -146,6 +198,9 @@ p.draw = function() {
   }
 }
 
+
+
+
 p.f = function(r){
   return 1/(r+0.2)/5;
 }
@@ -155,11 +210,14 @@ p.f_inv = function(r){
 
 
 p.show_contour = function(){
-  for(let i=0; i<8; i+=1){
-    gradientLine(p,0,0,1.5/2*w*math.cos(2*p.PI*i/8),1.5/2*w*math.sin(2*p.PI*i/8),p.col);
-  }
   let Nc = 10;
   let r;
+
+  for(let i=0; i<8; i+=1){
+    r = p.f_inv(p.f(1)*(Nc-1)/Nc+(1.-(Nc-1)/Nc)*p.f(0));
+    gradientLine(p,0,0,1.5/2*w*r*math.cos(2*p.PI*i/8),1.5/2*w*r*math.sin(2*p.PI*i/8),p.col);
+  }
+  
   p.noFill();
   for(let i=0; i<Nc; i+=1){
     r = p.f_inv(p.f(1)*i/Nc+(1.-i/Nc)*p.f(0));
@@ -511,13 +569,14 @@ p.catmullRom = function(p0, p1, p2, p3, t) {
 
 p.modify_points = function(mousePos){
   if (p.mouseButton === p.LEFT){
-    draggable = new Draggable(p,mousePos,[R]);
+    draggable = new Draggable(p,mousePos,[R_hitbox]);
+    draggable.show = p.create_show();
     draggable.show_shadow = p.create_show_shadow_draggable();
     draggable.handleDrag = p.create_handle_drag();
     D.push(draggable);
     UIObjects.push(draggable);
 
-  } else if (p.mouseButton === p.RIGHT && UIObjects.length>3) {
+  } else if (p.mouseButton === p.RIGHT && D.length>2) {
     D.pop();
     UIObjects.pop();
   }
