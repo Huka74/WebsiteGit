@@ -598,7 +598,7 @@ p.mousePressed = function(){
     p.modify_points(mousePos);
   }
 
-  return false;
+  // return false;
 }
 
 p.mouseDragged = function(){
@@ -613,7 +613,7 @@ p.mouseDragged = function(){
     X[1+ind] = draggedObject.position;
   }
 
-  return false;
+  // return false;
 }
 
 p.mouseReleased = function(){
