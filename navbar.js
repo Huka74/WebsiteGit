@@ -9,17 +9,27 @@ document.write(`
     <div class="dropdown">
       <span>Pages ▾</span>
         <div class="dropdown-content">
-          <div style="position:relative; left:5px">
-            Meca
+          <div class="dropdown-content-title">
+            Newtonian Mechanics
+            <hr>
             <a href="/WebsiteGit/Meca/Meca.html">Stationnary points</a>
+            <a href="/WebsiteGit/Coupled/Coupled.html">Coupled systems</a>
           </div>
-          <div style="position:relative; left:5px">
-            Langragian mechanics
+            
+
+          <div class="dropdown-content-title">
+            Lagrangian Mechanics
+            <hr>
+            <a href="/WebsiteGit/Lagrangian/Lagrangian.html">Principle of least action</a>
+            <a href="/WebsiteGit/DoublePendulum/DoublePendulum.html">Double Pendulum</a>
+            <a href="/WebsiteGit/DoublePendulum/DoublePendulumPeriodic.html">Double Pendulum Periodic</a>
             <a href="/WebsiteGit/Lagrangian/Brachistochrone.html">Brachistochrone</a>
             <a href="/WebsiteGit/Lagrangian/Catenary.html">Catenary</a>
           </div>
-          <div style="position:relative; left:5px">
-            Other
+
+          <div class="dropdown-content-title">
+            Quantum
+            <hr>
             <a href="/WebsiteGit/Hydrogen/Hydrogen.html">Hydrogen atom</a>
           </div>
           
@@ -71,6 +81,7 @@ document.write(`
     padding-right: 15px;
     display: flex;
     gap: 15px;
+    font-size: 20px;
   }
 
   .nav-left {
@@ -78,6 +89,7 @@ document.write(`
     padding-right: 15px;
     display: flex;
     gap: 15px;
+    font-size: 20px;
   }
 
   nav a {
@@ -95,15 +107,21 @@ document.write(`
     display: none;
     position: absolute;
     background-color: rgb(33, 150, 243);
-    min-width: 150px;
+    white-space: nowrap;
     top: 100%;
-    padding-top: 10px;
-    z-index: 1000;
+    // width: 100%;
+    // padding-top: 10px;
+    padding-bottom: 10px;
+    // left: 0;
+    // right: -200px;
+    z-index: 10;
   }
 
   .dropdown-content a {
     display: block;
-    padding: 8px 12px;
+    margin-left: 10px;
+    margin-top: 2px;
+    font-size: 18px;
   }
 
   .dropdown:hover .dropdown-content {
@@ -113,6 +131,24 @@ document.write(`
   .dropdown {
     position: relative;
   }
+
+  .dropdown-content-title {
+    background-color: inherit;
+    color: inherit;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 15px;
+    font-size: 18px;
+    z-index: 10;
+  }
+
+  .dropdown-content hr {
+    height: 1px;
+    border: 0;
+    border-top: 1px solid rgb(220, 220, 220);
+    width: 100%;
+  }
+
 
 </style>
 

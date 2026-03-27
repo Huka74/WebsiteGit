@@ -46,7 +46,7 @@
 
     <div id="p5-container-meca-coupled-trim"
     data-show="0"
-    style="position: relative; height:200px; width:600px; margin-left: auto; margin-right: auto;">
+    style="position: relative; height:200px; width:100%; max-width: 600px; margin-left: auto; margin-right: auto;">
     </div>
 
     Finding the evolution of the system might seem complicated, where the dynamic of the first
@@ -129,8 +129,9 @@
         \text{det}(A) = \prod_{i=1}^n\lambda_i
         \]
         For a \(2\times2\) matrix, knowing the sign of those two quantities gives us enough
-        information to get the signs of the eigenvalues. In our case, having a positive determinant
-        means that both eigenvalues have the same sign, and the sign is given by the trace.<br><br>
+        information to get the signs of the eigenvalues without having to explicitly solve for them.
+        In our case, having a positive determinant
+        means that both eigenvalues have the same sign, and it is given by the sign of trace.<br><br>
         
         Here is a table summarizing the different cases. (We can always rename the eigenvalues such that \(|\lambda_1|\le|\lambda_2|\))
         \[
@@ -142,7 +143,7 @@
         \hline
         \text{det}=0 & \lambda_1=0,\lambda_2>0 & \lambda_1=0,\lambda_2=0 & \lambda_1=0,\lambda_2&lt;0\\
         \hline
-        \text{det} &lt;0 & \lambda_1&lt;0,\lambda_2>0 & \lambda_1=-\lambda_2&lt;0 & \lambda_1>0,\lambda_2&lt;0\\
+        \text{det} &lt;0 & \lambda_1&lt;0,\lambda_2>0 & \lambda_1=-\lambda_2 & \lambda_1>0,\lambda_2&lt;0\\
         \hline
         \end{array}
         \]
@@ -279,11 +280,9 @@
 
 <div class="main-content"></div>
 
-<div id="p5-container-meca-coupled" style="position: relative; height:600px; width:600px; left:25%; top:0px;">
+<div id="p5-container-meca-coupled" style="position: relative; height:600px; width:100%; max-width: 600px; margin-left: auto; margin-right: auto;">
 </div>
 
-<div id="p5-container-doublependulum" style="position: relative; height:600px; width:600px; left:25%; top:0px;">
-</div>
 
 <script>
     function toggleDetails(trigger) {
@@ -307,9 +306,9 @@
 </div>
 </body>
 
-<script src="/Coupled/coupled.js"></script>
-<script src="/Coupled/doublependulum.js"></script>
-<script src="/utils.js"></script>
-<script src="/UIObjects.js"></script>
+<script src="Coupled/coupled.js"></script>
+<script src="Coupled/doublependulum.js"></script>
+<script src="utils.js"></script>
+<script src="UIObjects.js"></script>
 
 </html>

@@ -15,6 +15,7 @@ const lambd = 1;
 // const dt = 1/60;
 const dt_sim = 1/60;
 const R_mass = 8;
+const R_hitbox = 20;
 
 let theta = p.PI;
 let X_mass = [0,0];
@@ -48,10 +49,10 @@ p.setup = function() {
   let pos_sliders = [-150,75];
   // let pos_sliders = [0,0];
 
-  valuesliders = [new ValueSlider(p,pos=[pos_sliders[0],pos_sliders[1]],r_hitbox=[15],val=d,val_lim=[50,150],distance=2, container, name="d", precision=0),
-  new ValueSlider(p,pos=[pos_sliders[0],pos_sliders[1]+30],r_hitbox=[15],val=l,val_lim=[0,175],distance=0.5, container, name="l", precision=0),
-  new ValueSlider(p,pos=[pos_sliders[0],pos_sliders[1]+60],r_hitbox=[15],val=g,val_lim=[0,100],distance=1, container, name="g", precision=0),
-  new ValueSlider(p,pos=[pos_sliders[0],pos_sliders[1]+90],r_hitbox=[15],val=k,val_lim=[0,10],distance=10, container, name="k")];
+  valuesliders = [new ValueSlider(p,pos=[pos_sliders[0],pos_sliders[1]],r_hitbox=[R_hitbox],val=d,val_lim=[50,150],distance=2, container, name="d", precision=0),
+  new ValueSlider(p,pos=[pos_sliders[0],pos_sliders[1]+40],r_hitbox=[R_hitbox],val=l,val_lim=[0,175],distance=0.5, container, name="l", precision=0),
+  new ValueSlider(p,pos=[pos_sliders[0],pos_sliders[1]+40*2],r_hitbox=[R_hitbox],val=g,val_lim=[0,100],distance=1, container, name="g", precision=0),
+  new ValueSlider(p,pos=[pos_sliders[0],pos_sliders[1]+40*3],r_hitbox=[R_hitbox],val=k,val_lim=[0,10],distance=10, container, name="k")];
 
   A = new Axes(p,[0,-150],[30,1/50], p.color(255));
 
