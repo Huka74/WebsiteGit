@@ -15,7 +15,7 @@ const lambd = 1;
 // const dt = 1/60;
 const dt_sim = 1/60;
 const R_mass = 8;
-const R_hitbox = 20;
+const R_hitbox = 25;
 
 let theta = p.PI;
 let X_mass = [0,0];
@@ -359,6 +359,42 @@ p.mouseReleased = function(){
     return;
   }
 
+}
+
+p.touchStarted = function(){
+  let touch = p.touches[0];
+  if(!touch) return false;
+  
+  let mousePos = p.transformMouse([touch.x, touch.y], translation, scaling);
+
+  for(let obj of UIObjects) {
+    if(obj.isMouseOn([touch.x, touch.y], translation, scaling)){
+      obj.handlePress(mousePos[0], mousePos[1]);
+      draggedObject = obj;
+      return false; // prevents scroll AND stops loop
+    }
+  }
+  return false; // always prevent default scroll/zoom
+}
+
+p.touchMoved = function(){
+  let touch = p.touches[0];
+  if(!touch) return false;
+
+  let mousePos = p.transformMouse([touch.x, touch.y], translation, scaling);
+
+  if(draggedObject){
+    draggedObject.handleDrag(mousePos[0], mousePos[1]);
+  }
+  return false; // critical — prevents page scroll while dragging
+}
+
+p.touchEnded = function(){
+  if(draggedObject){
+    draggedObject.handleRelease();
+    draggedObject = null;
+  }
+  return false;
 }
 
 p.transformMouse = function([mouseX, mouseY], translation, scaling){

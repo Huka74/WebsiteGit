@@ -24,7 +24,7 @@ p.setup = function() {
 
   b = new Button(p,[0,0],10,3);
   d = new Draggable(p,[50,0],10);
-  dd = new ValueSlider(p,position=[100,0],r_hitbox=[10],val=1,val_lim=[0,5],distance=50, container=container, name="k", precision=1);
+  dd = new ValueSlider(p,position=[100,0],r_hitbox=[30],val=1,val_lim=[0,5],distance=50, container=container, name="k", precision=1);
 
   UIObjects = [b,d,dd];
 }
@@ -40,6 +40,8 @@ p.draw = function() {
   p.background(bgColor);
   p.translate(w/2,h/2);
   p.scale(1, -1);
+
+  p.circle(dd.position[0],dd.position[1],2*dd.r_hitbox[0]);
 
   p.circle(50,50,50);
   spring(p,[50,50],d.position,5,0.1,4,1);
@@ -77,7 +79,7 @@ p.mouseDragged = function() {
         return;
     }
 
-    return false;
+    // return false;
 }
 
 p.mouseReleased = function() {

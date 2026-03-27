@@ -118,6 +118,9 @@ class ValueSlider extends UIObject{
     this.divname.style("transform", "translate(-50%, -50%)");
     this.divname.style("user-select", "none");
     this.divname.style("color", color);
+    
+    this.divnum.style("pointer-events", "none");
+    this.divname.style("pointer-events", "none");
 
   }
 
