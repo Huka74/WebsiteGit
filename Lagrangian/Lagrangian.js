@@ -35,9 +35,6 @@ p.setup = function() {
   w = container.clientWidth
   h = container.clientHeight
 
-  bgColor = getComputedStyle(document.body).backgroundColor;
-  textColor = getComputedStyle(document.body).color;
-
 
   p.canvas.oncontextmenu = function(e) {
     e.preventDefault();

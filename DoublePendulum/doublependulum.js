@@ -1,12 +1,12 @@
 let SketchDoublePendulum = (containerId) => (p) => {
-let w = 600;
-let h = 600;
+let w;
+let h;
 
 let dt = 0.5;
 
 let X0 = [0,0];
 let N = 2;
-let theta = [-2,-2];
+let theta = [p.PI/2-0.5,p.PI+0.5];
 let theta_dot = [0,0];
 let X;
 
@@ -41,7 +41,7 @@ let bgColor;
 let textColor;
 let show_button;
 
-let translation = [w/2-40,h/2-200];
+let translation;
 let scaling = [1,-1];
 
 
@@ -53,11 +53,26 @@ p.setup = function() {
 
   show_button = container.dataset.show !== undefined ? parseFloat(container.dataset.show) : 1;
 
-  w = container.clientWidth
-  h = container.clientHeight
+  w = container.clientWidth;
+  h = container.clientHeight;
+  translation = [w/2,h/2*0.7];
+  let scale = w/2<l_vec[0]+l_vec[1] ? w/(l_vec[0]+l_vec[1])/2: 1;
+  console.log(w/2,l_vec[0]+l_vec[1],scale);
+  l_vec[0] *= scale;
+  l_vec[1] *= scale;
+  
 
   bgColor = getComputedStyle(document.body).backgroundColor;
   textColor = getComputedStyle(document.body).color;
+
+  const themeObserver = new MutationObserver(() => {
+    bgColor = getComputedStyle(document.body).backgroundColor;
+    textColor = getComputedStyle(document.body).color;
+  });
+  themeObserver.observe(document.body, { 
+    attributes: true, 
+    attributeFilter: ['class', 'data-theme', 'style'] 
+  });
   
   X = p.theta2X(theta);
 
@@ -140,14 +155,14 @@ p.setup = function() {
 
   // Buttons
 
-  button1 = new Button(p,[100-25,-50],[w_button,h_button,r_button],2);
-  button2 = new Button(p,[100+25,-50],[w_button,h_button,r_button],2);
+  button1 = new Button(p,[-25,100],[w_button,h_button,r_button],2);
+  button2 = new Button(p,[25,100],[w_button,h_button,r_button],2);
 
 
   button1.show = function() {
     p.showButton(this, {
       arrows: [
-        { xOffset: 10, angle: p.PI/2 },
+        { xOffset: 2, angle: -p.PI/2 },
         { xOffset: -10, angle: -p.PI/2 }
       ]
     });
@@ -168,7 +183,7 @@ p.setup = function() {
   button2.show = function() {
     p.showButton(this, {
       arrows: [
-        { xOffset: 2, angle: -p.PI/2 },
+        { xOffset: 10, angle: p.PI/2 },
         { xOffset: -10, angle: -p.PI/2 }
       ]
     });
@@ -214,6 +229,12 @@ p.showButton = function(button, config) {
   p.stroke(textColor);
   p.rect(button.position[0] - w_button/2, button.position[1] - h_button/2 - buttonOffset, w_button, h_button, r_button);
 
+  // Arrows
+  p.fill(textColor);
+  p.stroke(textColor);
+  arrows.forEach(({ xOffset, angle }) => {
+    arrow(p, [button.position[0] + xOffset, button.position[1] - buttonOffset], 8, 1, 4, angle);
+  });
 }
 
 p.showMasses = function(mass){
@@ -230,11 +251,8 @@ p.showMasses = function(mass){
 
 
 p.draw = function() {
-  bgColor = getComputedStyle(document.body).backgroundColor;
-  textColor = getComputedStyle(document.body).color;
 
-  // p.background(bgColor);
-  p.background(220);
+  p.background(bgColor);
   p.translate(translation[0],translation[1]);
   p.scale(scaling[0],scaling[1]);
 

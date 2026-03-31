@@ -2,7 +2,7 @@ let SketchPendulumPeriodicSingle = (containerId) => (p) => {
 let w;
 let h;
 
-const N_col = 3;
+let N_col;
 let size_x;
 let size_y;
 const offset_y = -20;
@@ -63,8 +63,16 @@ p.setup = function() {
   let canvas = p.createCanvas(container.clientWidth, container.clientHeight);
   canvas.parent(containerId);
 
+  canvas.elt.style.touchAction = 'pan-y';
+
   w = container.clientWidth;
   h = container.clientHeight;
+
+  N_col = w<350 ? 2 : 3;
+  // N_col = 2;
+
+  let scale = N_col==2 ? 0.4 : 0.65*w/800;
+  scaling = [scale,-scale];
 
   size_x = w/N_col;
   size_y = 255;
@@ -110,6 +118,7 @@ p.setup = function() {
   });
 
 }
+
     
 //////// DRAW ////////
 
