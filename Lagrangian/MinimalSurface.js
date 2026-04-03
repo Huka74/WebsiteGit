@@ -6,7 +6,7 @@ let meshWireBorder;
 
 let NZ = 30;
 const NTHETA = 30, NR = 10;
-let Z = 0.5;
+let Z = 0.6;
 let Z_old = Z;
 
 let show_discs = false;
@@ -206,7 +206,7 @@ p.buildMeshes = function(Z) {
     p.orbitControl(1, 1, 0);
     p.scale(100);
 
-    p.rotateY(-p.PI/3);
+    p.rotateY(-p.PI/3.4);
     p.rotateX(-0.1);
 
     // console.log(update_mesh)
