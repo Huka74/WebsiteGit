@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Part 1</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.9.0/lib/browser/math.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.1/katex.min.css">
+    <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js">
+    </script>
+
+    <base href="/WebsiteGit/">
+     <!-- <base href="/"> -->
+    <script src="navbar.js"></script>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+
+
+<!-- \(\definecolor{green}{RGB}{105,156,82}\)
+\(\definecolor{blue}{RGB}{35,107,142}\)
+\(\definecolor{red}{RGB}{207,80,68}\)
+\(\definecolor{yellow}{RGB}{232,193,28}\)
+\(\definecolor{orange}{RGB}{199,141,70}\) -->
+
+
+<div class="main-content">
+
+    
+
+    <h1>Minimal surface and soap film</h1>
+
+    
+
+    <input id="Z" type="range" min="0" max="1" step="0.01" value="0.3" style="position:relative; left: 50%; transform: translate(-50%, 0%); width:200px;">
+    <div id="eq-display" style="font-size: 12px;"></div>
+    <script>
+    const slider = document.getElementById('Z');
+    const display = document.getElementById('eq-display');
+
+    function render(val) {
+    katex.render(
+      `L = ${parseFloat(2*val).toFixed(2)}`,
+      display,
+      { throwOnError: false, displayMode: true }
+    );
+    }
+
+    render(slider.value);
+    slider.addEventListener('input', () => render(slider.value));
+    </script>
+
+    <a id="p5-container-bubble-link"></a>
+    <div id="p5-container-Bubble"
+    style="position: relative; height:400px; width: 100%; max-width:400px; margin-left: auto; margin-right: auto;"
+    class="framed";>
+    </div>
+    <br>
+
+    Let us consider two identical circles facing each other, whose centers lie on the same perpendicular axis.
+    What is the surface of smallest area that connects these two circles?
+
+    At first glance, this question may seem somewhat artificial.
+    However, problems involving minimal surfaces arise naturally in physics. 
+    A classic example is a thin soap film: such a film spontaneously adjusts its shape to minimize its surface area.
+    This happens because the energy associated with surface tension is proportional to the area of the surface.
+    As a result, the system seeks the configuration of lowest energy, that is, the one with minimal area.
+    This explains why soap bubble are a perfect sphere, as it is the shape that minimize the surface
+    area for a given volume. <br><br>
+    
+    In our case, the surface must connect the two given circles.
+    A natural first guess might be a cylinder, formed by connecting corresponding points on the two circles with straight segments.
+    However, this is not optimal as the surface area can be reduced if the connecting curves bend inward,
+    moving closer to the central axis.
+    By doing so, the intermediate rings of the surface become smaller.
+    This introduces a trade-off: on one hand, we want to keep the paths between the circles short.
+    On the other, we want to reduce the radius of the surface by pulling it inward toward the axis.
+
+    The surface that balances this trade-off is called a catenoid, made by
+    rotating a catenary curve around the axis.
+
+    Let us solve this minimal surface with the Lagrangian formalism
+    We denote \(z\) the axis going through both centers, and \(r_1\) and \(r_2\) the radii of the circles.
+    The circles are separated by a distance \(L\).
+    Because of the radial symmetry of the problem, we can only consider the function
+    \(r(z)\) for the surface. The boundary condition impose \(r(0)=r_1\) and \(r(L)=r_2\).
+    The surface area is then the sum of all the small circles along the \(z\) axis of thickness \(\mathrm{d}s\).
+    \[S = \int 2\pi r \mathrm{d}s \]
+    with \(\mathrm{d}s = \sqrt{\mathrm{d}z^2+\mathrm{d}r^2}\). <br>
+    Minimizing \(S[r]\) is the same problem as the Catenary curve problem, where we had to minimize
+    \(E[y] \propto \int y ds\), expect without constraint on the length.
+    Check <a href="Lagrangian/Catenary.html">Catenary</a> for the full derivation of the Catenary curve solution.<br>
+    This means that our surface will be a revolution of the catenary curve around the axis.
+    This is called a catenoid. <br>
+    
+    Using the Euler-Lagrange equation, we get for \(r(z)\)
+    \[r(z)=A\cosh\left(\frac{z-B}{A}\right)\]
+    with the boundary conditions to fix \(A\) and \(B\)
+    \begin{equation}
+    \left\{
+    \begin{array}{l}
+    A\cosh\left(\frac{B}{A}\right) = r_1\\
+    A\cosh\left(\frac{L-B}{A}\right) = r_2\\
+    \end{array}\right.
+    \end{equation}
+
+    It is possible to solve for \(B\) as a function of \(A\), but the remain equation
+    for \(A\) is transcendental.
+
+    <div class="collapsible-trigger" onclick="toggleDetails(this)">
+      <span class="arrow">▶</span>
+      <span>Show detailed steps</span>
+    </div>
+    <div class="details-box">
+        Denoting \(x=\frac{L}{A}\) and \(y=\frac{B}{A}\),
+        we can write the second equation as
+        \[A\cosh(x-y) = A\cosh(x)\cosh(y)-A\sinh(x)\sinh(y)=r_2\]
+        And inserting the first equation \(A\cosh(x)=r_1\) gives
+        \[\cosh(x)-\sinh(x)\tanh(y)=\frac{r_2}{r_1}\]
+        \[\tanh(y)=\frac{\cosh(x)-\frac{r_2}{r_1}}{\sinh(x)}
+        = \tanh\left(\frac{x}{2}\right)+\frac{1-\frac{r_2}{r_1}}{\sinh(x)}\]
+        \[B=A\:\text{arctanh}\left(\tanh\left(\frac{L}{2A}\right)+\frac{1-\frac{r_2}{r_1}}{\sinh\left(\frac{L}{A}\right)}\right)\]
+        
+        Using \(\cosh(\text{arctanh}(x)) = \frac{1}{\sqrt{1-x^2}}\), we a an equation for \(A\) that can be solve numerically
+        \[A = r_1\sqrt{ 1 - \left(\tanh\left(\frac{L}{2A}\right)+\frac{1-\frac{r_2}{r_1}}{\sinh\left(\frac{L}{A}\right)}\right)^2}\]
+    </div>
+
+
+    Taking \(r_1=r_2=r\), we get \(B=\frac{L}{2}\), and the equation for \(A\) is 
+    \[A\cosh\left(\frac{L}{2A}\right) = r\]
+    Denoting \(x=\frac{L}{2A}\) and \(\lambda=2\frac{r}{L}\) the equation becomes
+    \[f_{\lambda}(x)=\frac{1}{x}\cosh(x)-\lambda=0\] <br>
+    This equation is plot below
+
+
+    <div id="p5-container-BubblePlot"
+    style="position: relative; height:400px; width: 100%; max-width:400px; margin-left: auto; margin-right: auto;"
+    class="framed";>
+    </div>
+    
+    First, notice that sometimes the equation has two solutions. 
+    Those are two disctinct local minimal surfaces. In the 
+    <a href="#p5-container-bubble-link" class="custom-link" onclick="
+    const t = document.getElementById('p5-container-Bubble'),
+    r = t.getBoundingClientRect();
+    window.scrollTo({top:r.bottom+window.scrollY-r.height/2-window.innerHeight/2,behavior:'smooth'});
+    return false;">animation</a>, the smallest of those two solutions is shown. <br><br>
+
+
+
+    Additionnaly, we can see that this equation has solution only for \(\lambda\) greater than a critical \(\lambda^*\).
+    This critical \(\lambda^*\) can be computed by finding when the curve is tangent to the \(x\) axis.
+    In other words, when the derivative, and the value of the function is 0:
+    \[f_{\lambda^*}'(x) = -\frac{1}{x^2}\cosh(x)+\frac{1}{x}\sinh(x)=0\]
+    \[\Longrightarrow x\tanh(x)=1\]
+    This equation is independant of \(\lambda\) and can be solve numerically, giving \(x=c\approx 1.1997\). <br>
+    Using the previous definition of \(x\), we get \(L^*=2cA\).
+    Now imposing that \(f_{\lambda^*}(x)=0\)
+    \[\lambda^*=\frac{1}{c}\cosh(c)\]
+    \[L^*=r\frac{2c}{\cosh(c)}\approx 1.3255 r\] <br><br>
+
+    The fact that no solution exists for \(L>L^*\) only means that our formalism
+    could not find an extremal surfaces past this point. Physically, the minimal surface must still exits.
+    In fact, after that point, the minimal surface consist of two discs, connected by only a line.
+    This solution is on the extreme side of the afordmentionned trade-off, minimizing the radius of the surface.
+    This is not a differentiable surface and cannot be represented by our formalism. <br>
+
+    At the critical distance, the surface area of the catenoid is \(S=2\pi r^2 c\).
+    <div class="collapsible-trigger" onclick="toggleDetails(this)">
+      <span class="arrow">▶</span>
+      <span>Show detailed steps</span>
+    </div>
+    <div class="details-box">
+        Let us compute the surface area of the catenoid.
+        \[S=\int_0^{2\pi}\int_{0}^L r(z)dsd\theta = 2\pi \int_0^L r(z)\sqrt{1+r'(z)^2}dz\]
+        with \(r(z)=A\cosh\left(\frac{z-\frac{L}{2}}{A}\right)\)
+        \[\sqrt{1+r'(z)^2} = \cosh\left(\frac{z-\frac{L}{2}}{A}\right)\]
+        \[S = 2\pi \int_0^L A\cosh^2\left(\frac{z-\frac{L}{2}}{A}\right)dz  = \pi A\left(A\sinh\left(\frac{L}{A}\right)+L\right)\]
+
+        At the critical point, \(L=r\frac{2c}{\cosh c}\), \(A=\frac{r}{\cosh c}\), giving
+        \begin{equation}
+        \begin{split}
+        S & = \pi r^2 \frac{\sinh(2c)+2c}{\cosh^2 c}\\
+          & = 2\pi r^2\left(\tanh c + \frac{c}{\cosh^2 c}\right)\\
+          & = 2\pi r^2 \left(\tanh c+c(1-\tanh^2 c)\right)\\
+          & = 2\pi r^2 c\\
+        \end{split}
+        \end{equation}
+        recalling that \(c\) is defined by \(c\tanh c = 1\).
+    </div>
+    Compared to the two disks solution \(S=2\pi r^2\), we see that it has a smaller surface 
+    even before the catenoid stop existing.
+    The catenoid's surface becomes greater than the two discs when \(L\gtrsim1.0553r\), but still
+    exists as a local minimum.
+    <br><br><br>
+
+
+</div>
+
+
+
+<script>
+    function toggleDetails(trigger) {
+        const arrow = trigger.querySelector('.arrow');
+        const detailsBox = trigger.nextElementSibling;
+        const textSpan = trigger.querySelector('span:last-child');
+        
+        arrow.classList.toggle('expanded');
+        detailsBox.classList.toggle('expanded');
+        
+        if (detailsBox.classList.contains('expanded')) {
+            textSpan.textContent = 'Hide detailed steps';
+        } else {
+            textSpan.textContent = 'Show detailed steps';
+        }
+    }
+</script>
+
+
+
+</div>
+</body>
+
+<script src="Lagrangian/MinimalSurface.js"></script>
+<script src="Lagrangian/PlotMinimalSurface.js"></script>
+<script src="utils.js"></script>
+<script src="UIObjects.js"></script>
+
+</html>
